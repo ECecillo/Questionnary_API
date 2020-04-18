@@ -129,6 +129,7 @@ function renderCurrentQuizz() {
   main.innerHTML = `Ici les détails pour le quizz #${state.currentQuizz}`;
 }
 
+
 // quand on clique sur le bouton de login, il nous dit qui on est
 // eslint-disable-next-line no-unused-vars
 const renderUserBtn = () => {
@@ -137,21 +138,31 @@ const renderUserBtn = () => {
     if (state.user) {
       // eslint-disable-next-line no-alert
       /* alert(
-        `Bonjour ${state.user.firstname} ${state.user.lastname.toUpperCase()}`
+        `Bonjour ${state.user.firstname} ${state.user.lastname.toUpperCase()}` 
       ); */
-
+      getUser();
+      document.getElementById('content-logout').innerHTML +=
+        `<h5> ${state.user.lastname.toUpperCase()} ${state.user.firstname} (${state.user.user_id}) <br />
+        Vous êtes l'auteur de </h5>`;
+      document.getElementById('id-logout').onclick = function() {
+        state.xApiKey = '';
+        getUser();
+        document.location.reload(true);
+      }
 
     } else {
-      // eslint-disable-next-line no-alert
-      /* alert(
-        `Pour vous authentifier, remplir le champs xApiKey de l'objet state dans js/modele.js`
-      ); */
       const saisie = document.getElementById('api').value;
-      console.log(saisie);
       state.xApiKey = saisie;
       getUser();
-     
-      document.getElementById('confirm-message').innerHTML += '<h5 style="color:green;">Connecté !</h5>';
+      if (state.xApiKey != "") {
+        document.getElementById('confirm-message').innerHTML += '<h5 style="color:green;">Connecté !</h5>';
+        document.getElementById('login').remove();
+        document.getElementById('log').innerHTML += '<a class="waves-effect waves-light btn modal-trigger" id="id-login" href="#modal2"><i class="Large material-icons">keyboard_backspace</i></a>';
+      }
+      else {
+        document.getElementById('confirm-message').innerHTML += '<h5 style="color:crimson;">Veuillez vérifier votre saisie !</h5>';
+      }
+
     }
   };
 };

@@ -39,8 +39,8 @@
                   </div>
                 </form>
               </li>
-              <li>
-                <a class="waves-effect waves-light btn modal-trigger" href="#modal1">
+              <li id="log">
+                <a class="waves-effect waves-light btn modal-trigger" id="login" href="#modal1">
                   <i class="Large material-icons">account_circle</i>
                 </a>
               </li>
@@ -93,12 +93,12 @@
     </div>
   </main>
 
-  <!-- Modal Structure -->
+  <!-- Modal Structure for the login -->
   <div id="modal1" class="modal">
     <header class="head"><blockquote> <h4>Bienvenue</h4> </blockquote></header>
     <div class="modal-content">
       <label for="key"><strong>Entrer votre clé</strong></label>
-      <input type="text" id="api" name="name" class="key-input" placeholder="7038e76c-7fc3-423f-bfaa-97a0872bdb68">
+      <input type="text" id="api" name="name" class="key-input" placeholder="7038e76c-7fc3-423f-bfaa-97a0872bdb68" required>
     </div>
     <div class="modal-footer">
       <button class="modal-close btn waves-effect waves-light" type="button">Close
@@ -110,6 +110,22 @@
       <div id="confirm-message"></div>
     </div>
   </div>
+  <!-- Modal Structure to logout -->
+  <div id="modal2" class="modal">
+    <header class="head"><blockquote> <h4>Bienvenue</h4> </blockquote></header>
+    <div class="modal-content" id="content-logout"></div>
+    <div class="modal-footer">
+      <button class="modal-close btn waves-effect waves-light" type="button">OK
+        <i class="material-icons right">close</i>
+      </button>
+      <button class="btn waves-effect waves-light" type="submit" id="id-logout">Log out
+        <i class="material-icons right">send</i>
+      </button>
+      <div id="confirm-message"></div>
+    </div>
+  </div>
+
+
 
   <footer></footer>
 
