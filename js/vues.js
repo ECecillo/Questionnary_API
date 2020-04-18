@@ -134,7 +134,10 @@ const renderUserBtn = () => {
       /* alert(
         `Pour vous authentifier, remplir le champs xApiKey de l'objet state dans js/modele.js`
       ); */
-      
+      const saisie = document.getElementById('api').value;
+      console.log(saisie);
+      state.xApiKey = saisie;
+      getUser();
     }
   };
 };
