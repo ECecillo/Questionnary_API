@@ -120,17 +120,21 @@ function renderCurrentQuizz() {
 // eslint-disable-next-line no-unused-vars
 const renderUserBtn = () => {
   const btn = document.getElementById('id-login');
+  const modlog = "../models/modal.html";
   btn.onclick = () => {
     if (state.user) {
       // eslint-disable-next-line no-alert
-      alert(
+      /* alert(
         `Bonjour ${state.user.firstname} ${state.user.lastname.toUpperCase()}`
-      );
+      ); */
+      
+
     } else {
       // eslint-disable-next-line no-alert
-      alert(
+      /* alert(
         `Pour vous authentifier, remplir le champs xApiKey de l'objet state dans js/modele.js`
-      );
+      ); */
+      loadHtml(btn, modlog);
     }
   };
 };

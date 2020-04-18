@@ -1,3 +1,16 @@
+/* Récupère le contenu d'une page html */
+
+async function fetchHtmlAsText(url) {
+  return await (await fetch(url)).text();
+}
+
+/* Implémente le contenu dans le div */
+
+async function loadHtml(div, html) {
+  const Div = document.getElementById(div);
+  Div.innerHTML = await fetchHtmlAsText(html);
+}
+
 /* global M getUser getQuizzes state filterHttpResponse installWebSocket */
 
 // un simple ping/pong, pour montrer comment on envoie des données JSON au serveur
