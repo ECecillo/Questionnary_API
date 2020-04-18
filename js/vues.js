@@ -1,3 +1,16 @@
+/* document.addEventListener("DOMContentLoaded", function() {
+  const modal_class = document.getElementById('modal1');
+
+  var header = '<header class="head"><blockquote> <h4>Bienvenue</h4> </blockquote></header>';
+  var content = '<div class="modal-content"> <label for="key"><strong>Entrer votre clé</strong></label><input type="text" id="api" name="name" class="key-input" placeholder="7038e76c-7fc3-423f-bfaa-97a0872bdb68"></div>';
+  var footer = '<div class="modal-footer"><button class="btn waves-effect waves-light" type="submit" name="action" id="id-login">Login<i class="material-icons right">send</i></button></div>';
+  modal_class.appendChild(header);
+  modal_class.appendChild(content);
+  modal_class.appendChild(footer);
+  modal_class.modal();
+}); */
+
+
 /* global state getQuizzes */
 
 // //////////////////////////////////////////////////////////////////////////////
@@ -26,14 +39,14 @@ const htmlQuizzesList = (quizzes, curr, total) => {
   const prevBtn =
     curr !== 1
       ? `<button id="id-prev-quizzes" data-page="${curr -
-          1}" class="btn"><i class="material-icons">navigate_before</i></button>`
+      1}" class="btn"><i class="material-icons">navigate_before</i></button>`
       : '';
 
   // le bouton ">" pour aller à la page suivante, ou rien si c'est la première page
   const nextBtn =
     curr !== total
       ? `<button id="id-next-quizzes" data-page="${curr +
-          1}" class="btn"><i class="material-icons">navigate_next</i></button>`
+      1}" class="btn"><i class="material-icons">navigate_next</i></button>`
       : '';
 
   // La liste complète et les deux boutons en bas
@@ -120,14 +133,13 @@ function renderCurrentQuizz() {
 // eslint-disable-next-line no-unused-vars
 const renderUserBtn = () => {
   const btn = document.getElementById('id-login');
-  const modlog = "../models/modal.html";
   btn.onclick = () => {
     if (state.user) {
       // eslint-disable-next-line no-alert
       /* alert(
         `Bonjour ${state.user.firstname} ${state.user.lastname.toUpperCase()}`
       ); */
-      
+
 
     } else {
       // eslint-disable-next-line no-alert
@@ -138,6 +150,8 @@ const renderUserBtn = () => {
       console.log(saisie);
       state.xApiKey = saisie;
       getUser();
+     
+      document.getElementById('confirm-message').innerHTML += '<h5 style="color:green;">Connecté !</h5>';
     }
   };
 };

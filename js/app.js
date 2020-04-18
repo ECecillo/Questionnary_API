@@ -1,4 +1,5 @@
 
+
 /* global M getUser getQuizzes state filterHttpResponse installWebSocket */
 
 // un simple ping/pong, pour montrer comment on envoie des données JSON au serveur
