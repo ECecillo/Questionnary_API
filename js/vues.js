@@ -134,7 +134,7 @@ const renderUserBtn = () => {
       /* alert(
         `Pour vous authentifier, remplir le champs xApiKey de l'objet state dans js/modele.js`
       ); */
-      loadHtml(btn, modlog);
+      
     }
   };
 };
