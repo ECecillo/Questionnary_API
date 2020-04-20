@@ -1,16 +1,3 @@
-/* document.addEventListener("DOMContentLoaded", function() {
-  const modal_class = document.getElementById('modal1');
-
-  var header = '<header class="head"><blockquote> <h4>Bienvenue</h4> </blockquote></header>';
-  var content = '<div class="modal-content"> <label for="key"><strong>Entrer votre clé</strong></label><input type="text" id="api" name="name" class="key-input" placeholder="7038e76c-7fc3-423f-bfaa-97a0872bdb68"></div>';
-  var footer = '<div class="modal-footer"><button class="btn waves-effect waves-light" type="submit" name="action" id="id-login">Login<i class="material-icons right">send</i></button></div>';
-  modal_class.appendChild(header);
-  modal_class.appendChild(content);
-  modal_class.appendChild(footer);
-  modal_class.modal();
-}); */
-
-
 /* global state getQuizzes */
 
 // //////////////////////////////////////////////////////////////////////////////
@@ -109,13 +96,21 @@ function renderQuizzes() {
     const quizzId = this.dataset.quizzid;
     console.debug(`@clickQuiz(${quizzId})`);
     const addr = `${state.serverUrl}/quizzes/${quizzId}`;
-    const html = `
+    /* const html = `
       <p>Vous pourriez aller voir <a href="${addr}">${addr}</a>
       ou <a href="${addr}/questions">${addr}/questions</a> pour ses questions<p>.`;
-    modal.children[0].innerHTML = html;
-    state.currentQuizz = quizzId;
+    modal.children[0].innerHTML = html; */
+    
+    //state.currentQuizz = quizzId;
     // eslint-disable-next-line no-use-before-define
-    renderCurrentQuizz();
+    return fetch(addr, { method: 'GET', headers: state.headers() })
+    .then(filterHttpResponse)
+    .then((data) => {
+      // /!\ ICI L'ETAT EST MODIFIE /!\
+      state.currentQuizz = data;
+      // on lance le rendu du bouton de login
+      return renderCurrentQuizz();
+    });
   }
 
   // pour chaque quizz, on lui associe son handler
@@ -126,7 +121,7 @@ function renderQuizzes() {
 
 function renderCurrentQuizz() {
   const main = document.getElementById('id-all-quizzes-main');
-  main.innerHTML = `Ici les détails pour le quizz #${state.currentQuizz}`;
+  main.innerHTML = `Ici les détails pour le quizz #${state.currentQuizz.title}`;
 }
 
 
