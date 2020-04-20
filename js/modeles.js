@@ -18,6 +18,8 @@ const state = {
 
   // le quizz actuellement choisi
   currentQuizz: undefined,
+
+  titleQuiz: '',
 };
 
 // une méthode pour l'objet 'state' qui va générer les headers pour les appel à fetch

@@ -15,11 +15,11 @@ const htmlQuizzesList = (quizzes, curr, total) => {
   // VOIR https://materializecss.com/modals.html
   const quizzesLIst = quizzes.map(
     (q) =>
-      `<li class="collection-item modal-trigger cyan lighten-5" data-target="id-modal-quizz-menu" data-quizzid="${q.quiz_id}">
+      `<li class="collection-item cyan lighten-5" data-quizzid="${q.quiz_id}">
         <h5>${q.title}</h5>
         ${q.description} <a class="chip">${q.owner_id}</a>
       </li>`
-  );
+  ); /* modal-trigger data-target="id-modal-quizz-menu" */
 
   // le bouton "<" pour revenir à la page précédente, ou rien si c'est la première page
   // on fixe une donnée data-page pour savoir où aller via JS via element.dataset.page
@@ -89,6 +89,17 @@ function renderQuizzes() {
   if (prevBtn) prevBtn.onclick = clickBtnPager;
   if (nextBtn) nextBtn.onclick = clickBtnPager;
 
+
+  //Parcours json response
+  function maj_url (url_data) {
+    const title = url_data.map((contenu, indx) => ({
+      titre: desc.title,
+      descript: desc.description,
+    }));
+
+  }
+
+
   // qd on clique sur un quizz, on change sont contenu avant affichage
   // l'affichage sera automatiquement déclenché par materializecss car on
   // a définit .modal-trigger et data-target="id-modal-quizz-menu" dans le HTML
@@ -96,12 +107,18 @@ function renderQuizzes() {
     const quizzId = this.dataset.quizzid;
     console.debug(`@clickQuiz(${quizzId})`);
     const addr = `${state.serverUrl}/quizzes/${quizzId}`;
-    const html = `
+
+
+
+    // Affiche le modal quand on clique sur un quizz
+    /* const html = `
       <p>Vous pourriez aller voir <a href="${addr}">${addr}</a>
       ou <a href="${addr}/questions">${addr}/questions</a> pour ses questions<p>.`;
-    modal.children[0].innerHTML = html;
+    modal.children[0].innerHTML = html; */
+
     state.currentQuizz = quizzId;
     // eslint-disable-next-line no-use-before-define
+
     renderCurrentQuizz();
   }
 
@@ -113,7 +130,7 @@ function renderQuizzes() {
 
 function renderCurrentQuizz() {
   const main = document.getElementById('id-all-quizzes-main');
-  main.innerHTML = `Ici les détails pour le quizz #${state.currentQuizz}`;
+  main.innerHTML = ``;
 }
 
 // quand on clique sur le bouton de login, il nous dit qui on est
