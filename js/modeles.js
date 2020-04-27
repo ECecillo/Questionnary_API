@@ -116,3 +116,25 @@ const getUserQuizzes = (p = 1) => {
       return renderUserQuizzes();
     });
 };
+
+// mise-à-jour asynchrone de l'état avec les informations de l'utilisateur
+// getQuizzes télécharge la page 'p' des quizzes et la met dans l'état
+// puis relance le rendu
+// eslint-disable-next-line no-unused-vars
+const getAnswQuizzes = (p = 1) => {
+  console.debug(`@getAnswQuizzes`);
+  const url = `${state.serverUrl}/users/answers`;
+  
+  // le téléchargement est asynchrone, là màj de l'état et le rendu se fait dans le '.then'
+  return fetch(url, { method: 'GET', headers: state.headers() })
+    .then(filterHttpResponse)
+    .then((data) => {
+      // /!\ ICI L'ETAT EST MODIFIE /!\
+      state.quizzes = data;
+
+      // on a mis à jour les donnés, on peut relancer le rendu
+      // eslint-disable-next-line no-use-before-define
+      
+      return renderAnswQuizzes();
+    });
+};

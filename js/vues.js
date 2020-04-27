@@ -16,7 +16,7 @@ const htmlQuizzesList = (quizzes, curr, total) => {
   // Dans le class on avait : modal-trigger
   // data-target="id-modal-quizz-menu"
   const quizzesLIst = quizzes.map(
-    (q) => 
+    (q) =>
       `<li class="collection-item cyan lighten-5" data-quizzid="${q.quiz_id}"> 
         <h5>${q.title}</h5>
         ${q.description} <a class="chip">${q.owner_id}</a>
@@ -63,7 +63,7 @@ function renderQuizzes() {
   // les éléments à mettre à jour : le conteneur pour la liste des quizz
   const usersElt = document.getElementById('id-all-quizzes-list');
 
-  
+
   // on appelle la fonction de généraion et on met le HTML produit dans le DOM
   usersElt.innerHTML = htmlQuizzesList(
     state.quizzes.results,
@@ -99,8 +99,15 @@ function renderQuizzes() {
     const addr = `${state.serverUrl}/quizzes/${quizzId}`;
 
     state.currentQuizz = quizzId;
-    // eslint-disable-next-line no-use-before-define
-    renderCurrentQuizz();
+    
+    // télécharge le contenu du quiz aved l'id quizzId
+    return fetch(addr, { method: 'GET', headers: state.headers() })
+      .then(filterHttpResponse)
+      .then((data) => {
+        state.quizzes = data;
+
+        return renderCurrentQuizz();
+      });
   }
 
   // pour chaque quizz, on lui associe son handler
@@ -114,7 +121,7 @@ function renderUserQuizzes() {
 
   // les éléments à mettre à jour : le conteneur pour la liste des quizz
   const usersQuiz = document.getElementById('id-my-quizzes-list');
-  
+
   // on appelle la fonction de généraion et on met le HTML produit dans le DOM
   usersQuiz.innerHTML = htmlQuizzesList(
     state.quizzes,
@@ -147,12 +154,18 @@ function renderUserQuizzes() {
   function clickQuizUser() {
     const quizzId = this.dataset.quizzid;
     console.debug(`@clickUserQuiz(${quizzId})`);
-    const addr = `${state.serverUrl}/users/quizzes/${quizzId}`;
-    
-    
+    const addr = `${state.serverUrl}/quizzes/${quizzId}`;
+
+
     state.currentQuizz = quizzId;
-    // eslint-disable-next-line no-use-before-define
-    renderCurrentQuizz();
+    // télécharge le contenu du quiz aved l'id quizzId
+    return fetch(addr, { method: 'GET', headers: state.headers() })
+      .then(filterHttpResponse)
+      .then((data) => {
+        state.quizzes = data;
+
+        return renderCurrentQuizz();
+      });
   }
 
   // pour chaque quizz, on lui associe son handler
@@ -165,8 +178,33 @@ function renderCurrentQuizz() {
   const main = document.getElementById('id-all-quizzes-main');
   const mainUsers = document.getElementById('id-my-quizzes-main');
 
-  main.innerHTML = `Ici les détails pour le quizz #${state.currentQuizz}`;
-  mainUsers.innerHTML = `Ici les détails pour le quizz #${state.currentQuizz}`;
+  main.innerHTML = `<div class="card indigo lighten-5">
+        <div class="card-content black-text">
+          <span class="card-title">${state.quizzes.title}</span>
+            <p>Créer le ${state.quizzes.created_at} par <a class="chip"> ${state.quizzes.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
+            <p>description: ${state.quizzes.description}</p>
+        </div>
+        <div class="card-action">
+          <form>
+            
+          </form>
+        </div>
+      </div>`;
+
+  // Partie affichage des quiz de l'utilisateur
+
+  mainUsers.innerHTML = `<div class="card indigo lighten-5">
+        <div class="card-content black-text">
+          <span class="card-title">${state.quizzes.title}</span>
+            <p>Créer le ${state.quizzes.created_at} par <a class="chip"> VOUS <i class="Small material-icons">account_circle</i> </a></p>    
+            <p>description: ${state.quizzes.description}</p>
+        </div>
+        <div class="card-action">
+          <form>
+            
+          </form>
+        </div>
+      </div>`;
 
 }
 
@@ -181,7 +219,7 @@ const renderUserBtn = () => {
       document.getElementById('content-logout').innerHTML +=
         `<h5> ${state.user.lastname.toUpperCase()} ${state.user.firstname} (${state.user.user_id}) <br />
         Vous êtes l'auteur de </h5>`;
-      document.getElementById('id-logout').onclick = function() {
+      document.getElementById('id-logout').onclick = function () {
         state.xApiKey = '';
         getUser();
         document.location.reload(true);
