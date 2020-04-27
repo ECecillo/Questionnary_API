@@ -79,7 +79,7 @@ const getUser = () => {
 const getQuizzes = (p = 1) => {
   console.debug(`@getQuizzes(${p})`);
   const url = `${state.serverUrl}/quizzes/?page=${p}`;
-
+  
   // le téléchargement est asynchrone, là màj de l'état et le rendu se fait dans le '.then'
   return fetch(url, { method: 'GET', headers: state.headers() })
     .then(filterHttpResponse)
@@ -89,6 +89,30 @@ const getQuizzes = (p = 1) => {
 
       // on a mis à jour les donnés, on peut relancer le rendu
       // eslint-disable-next-line no-use-before-define
+      
       return renderQuizzes();
+    });
+};
+
+
+// mise-à-jour asynchrone de l'état avec les informations de l'utilisateur
+// getQuizzes télécharge la page 'p' des quizzes et la met dans l'état
+// puis relance le rendu
+// eslint-disable-next-line no-unused-vars
+const getUserQuizzes = (p = 1) => {
+  console.debug(`@getUserQuizzes`);
+  const url = `${state.serverUrl}/users/quizzes`;
+  
+  // le téléchargement est asynchrone, là màj de l'état et le rendu se fait dans le '.then'
+  return fetch(url, { method: 'GET', headers: state.headers() })
+    .then(filterHttpResponse)
+    .then((data) => {
+      // /!\ ICI L'ETAT EST MODIFIE /!\
+      state.quizzes = data;
+
+      // on a mis à jour les donnés, on peut relancer le rendu
+      // eslint-disable-next-line no-use-before-define
+      
+      return renderUserQuizzes();
     });
 };

@@ -1,16 +1,3 @@
-/* document.addEventListener("DOMContentLoaded", function() {
-  const modal_class = document.getElementById('modal1');
-
-  var header = '<header class="head"><blockquote> <h4>Bienvenue</h4> </blockquote></header>';
-  var content = '<div class="modal-content"> <label for="key"><strong>Entrer votre clé</strong></label><input type="text" id="api" name="name" class="key-input" placeholder="7038e76c-7fc3-423f-bfaa-97a0872bdb68"></div>';
-  var footer = '<div class="modal-footer"><button class="btn waves-effect waves-light" type="submit" name="action" id="id-login">Login<i class="material-icons right">send</i></button></div>';
-  modal_class.appendChild(header);
-  modal_class.appendChild(content);
-  modal_class.appendChild(footer);
-  modal_class.modal();
-}); */
-
-
 /* global state getQuizzes */
 
 // //////////////////////////////////////////////////////////////////////////////
@@ -26,9 +13,11 @@ const htmlQuizzesList = (quizzes, curr, total) => {
   // On définit aussi .modal-trigger et data-target="id-modal-quizz-menu"
   // pour qu'une fenêtre modale soit affichée quand on clique dessus
   // VOIR https://materializecss.com/modals.html
+  // Dans le class on avait : modal-trigger
+  // data-target="id-modal-quizz-menu"
   const quizzesLIst = quizzes.map(
-    (q) =>
-      `<li class="collection-item modal-trigger cyan lighten-5" data-target="id-modal-quizz-menu" data-quizzid="${q.quiz_id}">
+    (q) => 
+      `<li class="collection-item cyan lighten-5" data-quizzid="${q.quiz_id}"> 
         <h5>${q.title}</h5>
         ${q.description} <a class="chip">${q.owner_id}</a>
       </li>`
@@ -73,9 +62,8 @@ function renderQuizzes() {
 
   // les éléments à mettre à jour : le conteneur pour la liste des quizz
   const usersElt = document.getElementById('id-all-quizzes-list');
-  // une fenêtre modale définie dans le HTML
-  const modal = document.getElementById('id-modal-quizz-menu');
 
+  
   // on appelle la fonction de généraion et on met le HTML produit dans le DOM
   usersElt.innerHTML = htmlQuizzesList(
     state.quizzes.results,
@@ -109,10 +97,7 @@ function renderQuizzes() {
     const quizzId = this.dataset.quizzid;
     console.debug(`@clickQuiz(${quizzId})`);
     const addr = `${state.serverUrl}/quizzes/${quizzId}`;
-    const html = `
-      <p>Vous pourriez aller voir <a href="${addr}">${addr}</a>
-      ou <a href="${addr}/questions">${addr}/questions</a> pour ses questions<p>.`;
-    modal.children[0].innerHTML = html;
+
     state.currentQuizz = quizzId;
     // eslint-disable-next-line no-use-before-define
     renderCurrentQuizz();
@@ -124,9 +109,65 @@ function renderQuizzes() {
   });
 }
 
+function renderUserQuizzes() {
+  console.debug(`@renderUsersQuizzes()`);
+
+  // les éléments à mettre à jour : le conteneur pour la liste des quizz
+  const usersQuiz = document.getElementById('id-my-quizzes-list');
+  
+  // on appelle la fonction de généraion et on met le HTML produit dans le DOM
+  usersQuiz.innerHTML = htmlQuizzesList(
+    state.quizzes,
+    state.quizzes.currentPage,
+    state.quizzes.nbPages
+  );
+
+  // /!\ il faut que l'affectation usersElt.innerHTML = ... ait eu lieu pour
+  // /!\ que prevBtn, nextBtn et quizzes en soient pas null
+  // les éléments à mettre à jour : les boutons
+  const prevBtn = document.getElementById('id-prev-quizzes');
+  const nextBtn = document.getElementById('id-next-quizzes');
+  // la liste de tous les quizzes individuels
+  const quizzes = document.querySelectorAll('#id-my-quizzes-list li');
+
+  // les handlers quand on clique sur "<" ou ">"
+  function clickBtnPager() {
+    // remet à jour les données de state en demandant la page
+    // identifiée dans l'attribut data-page
+    // noter ici le 'this' QUI FAIT AUTOMATIQUEMENT REFERENCE
+    // A L'ELEMENT AUQUEL ON ATTACHE CE HANDLER
+    getUserQuizzes(this.dataset.page);
+  }
+  if (prevBtn) prevBtn.onclick = clickBtnPager;
+  if (nextBtn) nextBtn.onclick = clickBtnPager;
+
+  // qd on clique sur un quizz, on change sont contenu avant affichage
+  // l'affichage sera automatiquement déclenché par materializecss car on
+  // a définit .modal-trigger et data-target="id-modal-quizz-menu" dans le HTML
+  function clickQuizUser() {
+    const quizzId = this.dataset.quizzid;
+    console.debug(`@clickUserQuiz(${quizzId})`);
+    const addr = `${state.serverUrl}/users/quizzes/${quizzId}`;
+    
+    
+    state.currentQuizz = quizzId;
+    // eslint-disable-next-line no-use-before-define
+    renderCurrentQuizz();
+  }
+
+  // pour chaque quizz, on lui associe son handler
+  quizzes.forEach((q) => {
+    q.onclick = clickQuizUser;
+  });
+}
+
 function renderCurrentQuizz() {
   const main = document.getElementById('id-all-quizzes-main');
+  const mainUsers = document.getElementById('id-my-quizzes-main');
+
   main.innerHTML = `Ici les détails pour le quizz #${state.currentQuizz}`;
+  mainUsers.innerHTML = `Ici les détails pour le quizz #${state.currentQuizz}`;
+
 }
 
 
@@ -136,10 +177,6 @@ const renderUserBtn = () => {
   const btn = document.getElementById('id-login');
   btn.onclick = () => {
     if (state.user) {
-      // eslint-disable-next-line no-alert
-      /* alert(
-        `Bonjour ${state.user.firstname} ${state.user.lastname.toUpperCase()}` 
-      ); */
       getUser();
       document.getElementById('content-logout').innerHTML +=
         `<h5> ${state.user.lastname.toUpperCase()} ${state.user.firstname} (${state.user.user_id}) <br />
@@ -154,10 +191,11 @@ const renderUserBtn = () => {
       const saisie = document.getElementById('api').value;
       state.xApiKey = saisie;
       getUser();
-      if (state.xApiKey != "") {
+      if (state.xApiKey !== "") {
         document.getElementById('confirm-message').innerHTML += '<h5 style="color:green;">Connecté !</h5>';
         document.getElementById('login').remove();
         document.getElementById('log').innerHTML += '<a class="waves-effect waves-light btn modal-trigger" id="id-login" href="#modal2"><i class="Large material-icons">keyboard_backspace</i></a>';
+        getUserQuizzes();
       }
       else {
         document.getElementById('confirm-message').innerHTML += '<h5 style="color:crimson;">Veuillez vérifier votre saisie !</h5>';
