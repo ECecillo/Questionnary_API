@@ -164,7 +164,7 @@ function renderUserQuizzes() {
       .then((data) => {
         state.quizzes = data;
 
-        return renderCurrentQuizz();
+        return renderCurrentUserQuizz();
       });
   }
 
@@ -191,6 +191,11 @@ function renderCurrentQuizz() {
         </div>
       </div>`;
 
+}
+
+function renderCurrentUserQuizz() {
+  const mainUsers = document.getElementById('id-my-quizzes-main');
+
   // Partie affichage des quiz de l'utilisateur
 
   mainUsers.innerHTML = `<div class="card indigo lighten-5">
@@ -205,34 +210,38 @@ function renderCurrentQuizz() {
           </form>
         </div>
       </div>`;
-
 }
+
 
 
 // quand on clique sur le bouton de login, il nous dit qui on est
 // eslint-disable-next-line no-unused-vars
 const renderUserBtn = () => {
+  console.debug('@renderUserBtn()');
   const btn = document.getElementById('id-login');
+
   btn.onclick = () => {
     if (state.user) {
-      getUser();
+      document.getElementById('login').remove();
+      document.getElementById('log').innerHTML += '<a class="waves-effect waves-light btn modal-trigger" id="id-login" href="#modal2"><i class="Large material-icons">keyboard_backspace</i></a>';
       document.getElementById('content-logout').innerHTML +=
         `<h5> ${state.user.lastname.toUpperCase()} ${state.user.firstname} (${state.user.user_id}) <br />
         Vous êtes l'auteur de </h5>`;
       document.getElementById('id-logout').onclick = function () {
         state.xApiKey = '';
-        getUser();
+        //getUser();
         document.location.reload(true);
       }
 
     } else {
       const saisie = document.getElementById('api').value;
       state.xApiKey = saisie;
-      getUser();
+
       if (state.xApiKey !== "") {
         document.getElementById('confirm-message').innerHTML += '<h5 style="color:green;">Connecté !</h5>';
         document.getElementById('login').remove();
         document.getElementById('log').innerHTML += '<a class="waves-effect waves-light btn modal-trigger" id="id-login" href="#modal2"><i class="Large material-icons">keyboard_backspace</i></a>';
+        getUser();
         getUserQuizzes();
       }
       else {
@@ -242,3 +251,4 @@ const renderUserBtn = () => {
     }
   };
 };
+
