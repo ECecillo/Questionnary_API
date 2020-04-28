@@ -104,9 +104,32 @@ function renderQuizzes() {
     return fetch(addr, { method: 'GET', headers: state.headers() })
       .then(filterHttpResponse)
       .then((data) => {
-        state.quizzes = data;
+        state.quizzes = data; // C'est dans quizzes qu'on récup le nombre de question et donc l'id question.
+        
+        state.quizzes.questions_ids.forEach(qid => {
+          var question_addr = `${state.serverUrl}/quizzes/${quizzId}/questions/${qid}`;
 
-        return renderCurrentQuizz();
+          return fetch(question_addr, { method: 'GET', headers: state.headers() })
+          .then(filterHttpResponse)
+          .then((data) => {
+              const question_prop = data.map (
+                q => 
+                  `<form>
+                    <div>
+                      <label>${q.sentence}</label>
+                      <div>
+                        <input>
+                        <label>${q.proposition[].content}</label>
+                      </div>
+                    </div>
+                  </form>`
+                );
+
+            }
+          ) 
+        });
+        
+         renderCurrentQuizz();
       });
   }
 
@@ -155,6 +178,7 @@ function renderUserQuizzes() {
     const quizzId = this.dataset.quizzid;
     console.debug(`@clickUserQuiz(${quizzId})`);
     const addr = `${state.serverUrl}/quizzes/${quizzId}`;
+    const question = `${state.serverUrl}/quizzes/${quizzId}/`
 
 
     state.currentQuizz = quizzId;
@@ -184,11 +208,6 @@ function renderCurrentQuizz() {
             <p>Créer le ${state.quizzes.created_at} par <a class="chip"> ${state.quizzes.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
             <p>description: ${state.quizzes.description}</p>
         </div>
-        <div class="card-action">
-          <form>
-            
-          </form>
-        </div>
       </div>`;
 
 }
@@ -203,12 +222,7 @@ function renderCurrentUserQuizz() {
           <span class="card-title">${state.quizzes.title}</span>
             <p>Créer le ${state.quizzes.created_at} par <a class="chip"> VOUS <i class="Small material-icons">account_circle</i> </a></p>    
             <p>description: ${state.quizzes.description}</p>
-        </div>
-        <div class="card-action">
-          <form>
-            
-          </form>
-        </div>
+        </div> 
       </div>`;
 }
 
