@@ -1,3 +1,16 @@
+/* document.addEventListener("DOMContentLoaded", function() {
+  const modal_class = document.getElementById('modal1');
+
+  var header = '<header class="head"><blockquote> <h4>Bienvenue</h4> </blockquote></header>';
+  var content = '<div class="modal-content"> <label for="key"><strong>Entrer votre clé</strong></label><input type="text" id="api" name="name" class="key-input" placeholder="7038e76c-7fc3-423f-bfaa-97a0872bdb68"></div>';
+  var footer = '<div class="modal-footer"><button class="btn waves-effect waves-light" type="submit" name="action" id="id-login">Login<i class="material-icons right">send</i></button></div>';
+  modal_class.appendChild(header);
+  modal_class.appendChild(content);
+  modal_class.appendChild(footer);
+  modal_class.modal();
+}); */
+
+
 /* global state getQuizzes */
 
 // //////////////////////////////////////////////////////////////////////////////
@@ -26,14 +39,14 @@ const htmlQuizzesList = (quizzes, curr, total) => {
   const prevBtn =
     curr !== 1
       ? `<button id="id-prev-quizzes" data-page="${curr -
-          1}" class="btn"><i class="material-icons">navigate_before</i></button>`
+      1}" class="btn"><i class="material-icons">navigate_before</i></button>`
       : '';
 
   // le bouton ">" pour aller à la page suivante, ou rien si c'est la première page
   const nextBtn =
     curr !== total
       ? `<button id="id-next-quizzes" data-page="${curr +
-          1}" class="btn"><i class="material-icons">navigate_next</i></button>`
+      1}" class="btn"><i class="material-icons">navigate_next</i></button>`
       : '';
 
   // La liste complète et les deux boutons en bas
@@ -107,20 +120,37 @@ function renderQuizzes() {
     const quizzId = this.dataset.quizzid;
     console.debug(`@clickQuiz(${quizzId})`);
     const addr = `${state.serverUrl}/quizzes/${quizzId}`;
-
-
-
-    // Affiche le modal quand on clique sur un quizz
-    /* const html = `
+    const quest = `${state.serverUrl}/quizzes/${quizzId}/questions`;
+    /*const html = `
       <p>Vous pourriez aller voir <a href="${addr}">${addr}</a>
       ou <a href="${addr}/questions">${addr}/questions</a> pour ses questions<p>.`;
-    modal.children[0].innerHTML = html; */
-
-    state.currentQuizz = quizzId;
+    modal.children[0].innerHTML = html;*/
+    return fetch(addr,{method:'GET',headers:state.headers()})
+      .then(filterHttpResponse)
+      .then((data)=>{
+    /*const html = `
+      <p>Vous pourriez aller voir <a href="${addr}">${addr}</a>
+      ou <a href="${addr}/questions">${addr}/questions</a> pour ses questions<p>.`;
+    modal.children[0].innerHTML = html;*/
+        state.currentQuizz = data;
+        console.log(state.currentQuizz);
+        return fetch(quest,{method:'GET',headers:state.headers()})
+          .then(filterHttpResponse)
+          .then((data)=>{
+            state.quizzes=data;
+            renderCurrentQuizz();
+          });
     // eslint-disable-next-line no-use-before-define
-
-    renderCurrentQuizz();
-  }
+        return renderCurrentQuizz();
+      });
+  /*return fetch(quest,{method:'GET',headers:state.headers()})
+  .then(filterHttpResponse)
+  .then((data)=>{
+  state.quizzes=data;
+  console.log(state.quizzes)
+  renderCurrentQuizz();
+  });*/
+    };
 
   // pour chaque quizz, on lui associe son handler
   quizzes.forEach((q) => {
@@ -129,9 +159,23 @@ function renderQuizzes() {
 }
 
 function renderCurrentQuizz() {
+  var quest='';
+  for(var i=0;i<state.quizzes.length;i++){
+    quest+= state.quizzes[i].sentence;
+    quest+='<br/>';
+    for(var j=0;j<state.quizzes[i].propositions_number;j++){
+      quest+=state.quizzes[i].propositions[j].content;
+      quest+=' ';
+    }
+    quest+='<br/>';
+  }
+  console.log(quest);
   const main = document.getElementById('id-all-quizzes-main');
-  main.innerHTML = ``;
+
+  main.innerHTML = `${state.currentQuizz.title} <br/> ${state.currentQuizz.created_at} <br/> ${state.currentQuizz.description}<br/>`;
+  main.innerHTML+=quest;
 }
+
 
 // quand on clique sur le bouton de login, il nous dit qui on est
 // eslint-disable-next-line no-unused-vars
@@ -140,14 +184,32 @@ const renderUserBtn = () => {
   btn.onclick = () => {
     if (state.user) {
       // eslint-disable-next-line no-alert
-      alert(
-        `Bonjour ${state.user.firstname} ${state.user.lastname.toUpperCase()}`
-      );
+      /* alert(
+        `Bonjour ${state.user.firstname} ${state.user.lastname.toUpperCase()}` 
+      ); */
+      getUser();
+      document.getElementById('content-logout').innerHTML +=
+        `<h5> ${state.user.lastname.toUpperCase()} ${state.user.firstname} (${state.user.user_id}) <br />
+        Vous êtes l'auteur de </h5>`;
+      document.getElementById('id-logout').onclick = function() {
+        state.xApiKey = '';
+        getUser();
+        document.location.reload(true);
+      }
+
     } else {
-      // eslint-disable-next-line no-alert
-      alert(
-        `Pour vous authentifier, remplir le champs xApiKey de l'objet state dans js/modele.js`
-      );
+      const saisie = document.getElementById('api').value;
+      state.xApiKey = saisie;
+      getUser();
+      if (state.xApiKey != "") {
+        document.getElementById('confirm-message').innerHTML += '<h5 style="color:green;">Connecté !</h5>';
+        document.getElementById('login').remove();
+        document.getElementById('log').innerHTML += '<a class="waves-effect waves-light btn modal-trigger" id="id-login" href="#modal2"><i class="Large material-icons">keyboard_backspace</i></a>';
+      }
+      else {
+        document.getElementById('confirm-message').innerHTML += '<h5 style="color:crimson;">Veuillez vérifier votre saisie !</h5>';
+      }
+
     }
   };
 };

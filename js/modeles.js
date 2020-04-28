@@ -8,7 +8,7 @@
 // on pourrait le stocker dans le LocalStorage par exemple
 const state = {
   // la clef de l'utilisateur
-  xApiKey: '',
+  xApiKey: '', //Ma clé : 7726bb9b-f8b3-4a58-95de-a2eeb9ad4d78
 
   // l'URL du serveur où accéder aux données
   serverUrl: 'https://lifap5.univ-lyon1.fr',
@@ -19,15 +19,15 @@ const state = {
   // le quizz actuellement choisi
   currentQuizz: undefined,
 
-  titleQuiz: '',
+  // une méthode pour l'objet 'state' qui va générer les headers pour les appel à fetch
+  headers() {
+    const headers = new Headers();
+    headers.set('X-API-KEY', this.xApiKey);
+    headers.set('Accept', 'application/json');
+    headers.set('Content-Type', 'application/json');
+    return headers;
+  },
 };
-
-// une méthode pour l'objet 'state' qui va générer les headers pour les appel à fetch
-const headers = new Headers();
-headers.set('X-API-KEY', state.xApiKey);
-headers.set('Accept', 'application/json');
-headers.set('Content-Type', 'application/json');
-state.headers = headers;
 
 // //////////////////////////////////////////////////////////////////////////////
 // OUTILS génériques
@@ -58,7 +58,7 @@ function filterHttpResponse(response) {
 const getUser = () => {
   console.debug(`@getUser()`);
   const url = `${state.serverUrl}/users/whoami`;
-  return fetch(url, { method: 'GET', headers: state.headers })
+  return fetch(url, { method: 'GET', headers: state.headers() })
     .then(filterHttpResponse)
     .then((data) => {
       // /!\ ICI L'ETAT EST MODIFIE /!\
@@ -81,7 +81,7 @@ const getQuizzes = (p = 1) => {
   const url = `${state.serverUrl}/quizzes/?page=${p}`;
 
   // le téléchargement est asynchrone, là màj de l'état et le rendu se fait dans le '.then'
-  return fetch(url, { method: 'GET', headers: state.headers })
+  return fetch(url, { method: 'GET', headers: state.headers() })
     .then(filterHttpResponse)
     .then((data) => {
       // /!\ ICI L'ETAT EST MODIFIE /!\
