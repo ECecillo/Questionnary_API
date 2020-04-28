@@ -127,13 +127,6 @@ function renderQuizzes() {
           .then(filterHttpResponse)
           .then((data)=>{
             state.quizzes=data;
-            const test=state.quizzes;
-            test.forEach(function(test){
-              const propositions=test.propositions;
-              propositions.forEach(function(propositions){
-                console.log(propositions.content);
-              });
-            });
             renderCurrentQuizz();
           });
     // eslint-disable-next-line no-use-before-define
@@ -155,8 +148,20 @@ function renderQuizzes() {
 }
 
 function renderCurrentQuizz() {
+  var quest='';
+  for(var i=0;i<state.quizzes.length;i++){
+    quest+= state.quizzes[i].sentence;
+    quest+='<br/>';
+    for(var j=0;j<state.quizzes[i].propositions_number;j++){
+      quest+=state.quizzes[i].propositions[j].content;
+      quest+=' ';
+    }
+    quest+='<br/>';
+  }
+  console.log(quest);
   const main = document.getElementById('id-all-quizzes-main');
-  main.innerHTML = `<p>Description : ${state.currentQuizz.description}</p>`;
+  main.innerHTML = `${state.currentQuizz.title} <br/> ${state.currentQuizz.created_at} <br/> ${state.currentQuizz.description}<br/>`;
+  main.innerHTML+=quest;
 }
 
 
