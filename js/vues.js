@@ -150,24 +150,26 @@ function renderCurrentQuizz() {
     quest+='<br/>';
     for(var j=0;j<state.quizzes[i].propositions_number;j++){
       quest+=state.quizzes[i].propositions[j].content;
-      quest+=' ';
+      quest+="<input type="radio" id="huey" name="drone" value="huey"
+      checked>
+<label for="huey">Huey</label>";
     }
     quest+='<br/>';
   }
   console.log(quest);
   const main = document.getElementById('id-all-quizzes-main');
-
+  const quest_propo = document.getElementById('quest_propo');
+  
   main.innerHTML = `<div class="card indigo lighten-5">
         <div class="card-content black-text">
           <span class="card-title">${state.currentQuizz.title}</span>
-            <p>Créer le ${state.currentQuizz.created_at} par <a class="chip"> ${state.quizzes.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
-            <p>description: ${state.currentQuizz.description}</p>
-            <form class="quest_propo">
-
+            <p>Créer le ${state.currentQuizz.created_at} par <a class="chip"> ${state.currentQuizz.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
+            <p>description: ${state.currentQuizz.description}</p> <br>
+            <form id="quest_propo">
+              ${quest}
             </form>
         </div>
       </div>`;
-  main.innerHTML+=quest;
 }
 
 
