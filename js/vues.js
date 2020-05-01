@@ -121,17 +121,9 @@ function renderQuizzes() {
     console.debug(`@clickQuiz(${quizzId})`);
     const addr = `${state.serverUrl}/quizzes/${quizzId}`;
     const quest = `${state.serverUrl}/quizzes/${quizzId}/questions`;
-    /*const html = `
-      <p>Vous pourriez aller voir <a href="${addr}">${addr}</a>
-      ou <a href="${addr}/questions">${addr}/questions</a> pour ses questions<p>.`;
-    modal.children[0].innerHTML = html;*/
     return fetch(addr,{method:'GET',headers:state.headers()})
       .then(filterHttpResponse)
       .then((data)=>{
-    /*const html = `
-      <p>Vous pourriez aller voir <a href="${addr}">${addr}</a>
-      ou <a href="${addr}/questions">${addr}/questions</a> pour ses questions<p>.`;
-    modal.children[0].innerHTML = html;*/
         state.currentQuizz = data;
         console.log(state.currentQuizz);
         return fetch(quest,{method:'GET',headers:state.headers()})
@@ -143,13 +135,6 @@ function renderQuizzes() {
     // eslint-disable-next-line no-use-before-define
         return renderCurrentQuizz();
       });
-  /*return fetch(quest,{method:'GET',headers:state.headers()})
-  .then(filterHttpResponse)
-  .then((data)=>{
-  state.quizzes=data;
-  console.log(state.quizzes)
-  renderCurrentQuizz();
-  });*/
     };
 
   // pour chaque quizz, on lui associe son handler
