@@ -157,7 +157,16 @@ function renderCurrentQuizz() {
   console.log(quest);
   const main = document.getElementById('id-all-quizzes-main');
 
-  main.innerHTML = `${state.currentQuizz.title} <br/> ${state.currentQuizz.created_at} <br/> ${state.currentQuizz.description}<br/>`;
+  main.innerHTML = `<div class="card indigo lighten-5">
+        <div class="card-content black-text">
+          <span class="card-title">${state.quizzes.title}</span>
+            <p>Créer le ${state.quizzes.created_at} par <a class="chip"> ${state.quizzes.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
+            <p>description: ${state.quizzes.description}</p>
+            <form class="quest_propo">
+
+            </form>
+        </div>
+      </div>`;
   main.innerHTML+=quest;
 }
 
