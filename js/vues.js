@@ -62,6 +62,88 @@ const htmlQuizzesList = (quizzes, curr, total) => {
   return html;
 };
 
+const htmlQuizzesListContent = (quiz, answers) => {
+  console.debug(`@htmlQuizzesListContent(${quiz})`);
+
+  // /!\ Génère les radios pour les réponses /!\
+  //prop : quizzes.proposition
+  //id: quizzes.quiz_id pour récup l'id du quiz
+  //answer: les réponses qui sont dans la requpête
+  const Propositions = (prop, id, answer, disabled) =>
+    prop.map((p) => {
+      return `<label>
+              <input type="radio" name="${id}" value="${p.proposition_id}" ${
+        disabled ? "disabled" : ""} 
+              ${answer !== undefined && answer.p === p.proposition_id ? "checked" : ""}>
+              <span>${p.content}</span>
+           </label>`;
+    });
+
+  // /!\ Pour chaque question on parcours les propositions /!\
+  // question: state.currentQuizzes
+  // answers: 
+  const Question = (questions, answers, disabled) =>
+    questions.map(
+      (q) =>
+        `<p>${q.sentence}</p>
+        ${Propositions(
+          q.propositions,
+          q.question_id,
+          answers !== undefined
+            ? answers.find((elt) => elt.q === q.question_id)
+            : undefined,
+          disabled
+        ).join("")}`
+    );
+  //On déclare ces deux consantes qui serviront pour l'évalution du submit
+  const noDisabled = quiz.info.open && state.user !== undefined;
+  const noSubmit =
+    state.user !== undefined && quiz.info.owner_id === state.user.user_id;
+  // /!\ Fonction qui contient toute les conditions qui doivennt être remplis pour le submit /!\
+  // quiz: le tableau du quiz que l'utilisateur à choisi
+  function checkValidate(quiz) {
+    const btnDisplay = !quiz.info.open
+      ? "Quiz fermé"
+      : state.user === undefined
+        ? "Utilisateur non connecté"
+        : "Répondre";
+
+    return RenderSubButt(noSubmit, noDisabled, btnDisplay);
+  }
+  // /!\ Vérifie si le bouton valider a été soumis par l'user /!\
+  function RenderSubButt(noSub, noDisab, idBtn) {
+    if (noSub) {
+      return "";
+    }
+    else {
+      return `</br>
+    <input type="submit" value="${idBtn}" class="btn" id="btn-submit"
+    ${ noDisab ? "" : "disabled"}>`;
+    }
+  }
+  // /!\ Html du form qui sera mis dans Quizhtml pour le renderQuiz /!\
+  const FormQuiz = `
+  <form id="quizz" data-id="${quiz.info.quiz_id}">
+    ${Question(quiz.questions, answers, !noDisabled || noSubmit).join("<br>")}
+    ${checkValidate(quiz, answers)} 
+  </form>`;
+
+  // /!\ L'html qui sera mis dans RenderCurrentQuiz pour afficher le titre, desc ... /!\
+  const Quizhtml = `
+  <div class="card indigo lighten-5">
+    <div class="card-content black-text">
+      <span class="card-title">${quiz.info.title}</span>
+        <p>Créer le ${quiz.info.created_at} par <a class="chip"> ${quiz.info.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
+        <p>description: ${quiz.info.description}</p> <br>
+          <form id="quizz" data-id="${quiz.info.quiz_id}">
+            ${Question(quiz.questions, answers, !noDisabled || noSubmit).join("<br>")}
+            ${checkValidate(quiz, answers)} 
+          </form>
+    </div>
+  </div>`;
+  return Quizhtml;
+};
+
 // //////////////////////////////////////////////////////////////////////////////
 // RENDUS : mise en place du HTML dans le DOM et association des événemets
 // //////////////////////////////////////////////////////////////////////////////
@@ -119,22 +201,12 @@ function renderQuizzes() {
   function clickQuiz() {
     const quizzId = this.dataset.quizzid;
     console.debug(`@clickQuiz(${quizzId})`);
-    const addr = `${state.serverUrl}/quizzes/${quizzId}`;
-    const quest = `${state.serverUrl}/quizzes/${quizzId}/questions`;
-    return fetch(addr, { method: 'GET', headers: state.headers() })
-      .then(filterHttpResponse)
-      .then((data) => {
-        state.currentQuizz = data;
-        console.log(state.currentQuizz);
-        return fetch(quest, { method: 'GET', headers: state.headers() })
-          .then(filterHttpResponse)
-          .then((data) => {
-            state.quizzes = data;
-            renderCurrentQuizz();
-          });
-        // eslint-disable-next-line no-use-before-define
-        return renderCurrentQuizz();
-      });
+    state.currentQuizz = quizzId;
+
+    return getQuizzData(quizzId).then((data) => {
+      const Info = state.quizzes.results.find((e) => e.quiz_id === Number(quizzId));
+      return renderCurrentQuizz({ info: Info, questions: data });
+    });
   };
 
   // pour chaque quizz, on lui associe son handler
@@ -144,38 +216,16 @@ function renderQuizzes() {
 }
 
 
-function renderCurrentQuizz() {
-  var quest = '';
-  const propo = document.getElementById('content-propo');
+function renderCurrentQuizz(data) {
+  console.debug(`@renderCurrentQuizz()`);
   const main = document.getElementById('id-all-quizzes-main');
 
-  main.innerHTML += `<div class="card indigo lighten-5">
-        <div class="card-content black-text">
-          <span class="card-title">${state.currentQuizz.title}</span>
-            <p>Créer le ${state.currentQuizz.created_at} par <a class="chip"> ${state.currentQuizz.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
-            <p>description: ${state.currentQuizz.description}</p> <br>
-            <form action="#">
-              <p id="content-propo">
-              </p>
-            </form>
-        </div>
-      </div>`;
-
-
-  for (var i = 0; i < state.quizzes.length; i++) {
-    quest += state.quizzes[i].sentence;
-    quest += '<br/>';
-    for (var j = 0; j < state.quizzes[i].propositions_number; j++) {
-      quest += state.quizzes[i].propositions[j].content;
-      propo.innerHTML = `
-      <label>
-        <input type="checkbox" />
-        <span>${quest}</span>
-    </label>`;
-    }
-    quest += '<br/>';
+  if (data === undefined) {
+    main.innerHTML = "Pas de data";
   }
-  console.log(quest);
+  else {
+    main.innerHTML = htmlQuizzesListContent(data);
+  }
 
 }
 

@@ -92,3 +92,47 @@ const getQuizzes = (p = 1) => {
       return renderQuizzes();
     });
 };
+
+// /!\ Télécharge le quiz avec les infos général /!\
+function getQuizzInfo(id) {
+  console.debug(`@getQuizzInfo(${id})`);
+  const url = `${state.serverUrl}/quizzes/${id}`;
+
+  return fetch(url, { method: "GET", headers: state.headers() }).then(
+    filterHttpResponse
+  );
+}
+
+// /!\ On récupère les données du quiz grâce à l'id (propositions, questions ...) /!\
+// id: id qui est dans currentQuiz quand on sélectionnera le quiz
+function getQuizzData(id) {
+  console.debug(`@getQuizzData(${id})`);
+  const url = `${state.serverUrl}/quizzes/${id}/questions`;
+
+  return fetch(url, { method: "GET", headers: state.headers() }).then(
+    filterHttpResponse
+  );
+}
+
+// /!\ Va chercher toutes les infos d'un quizz avec son id, on a ces réponses ect ... /!\
+// id: est l'identifiant du quizz à télécharger
+// info: infos sur le quizz
+// data: questions du quizz
+function getInfoData(id) {
+  console.debug(`@getInfoData(${id})`);
+  const Info = `${state.serverUrl}/quizzes/${id}`;
+  const Data = `${urlInfo}/questions`;
+
+  return fetch(Data, { method: "GET", headers: state.headers() })
+    .then(filterHttpResponse)
+    .then((data) =>
+      // eslint-disable-next-line promise/no-nesting
+      fetch(Info, { method: "GET", headers: state.headers() })
+        .then(filterHttpResponse)
+        .then((res) => {
+          state.currentQuizzData = { info: res, questions: data }; // Un objet avec toutes les infos
+          return state.currentQuizzData;
+        })
+    )
+    .catch((err) => console.error(`Erreur: ${err}`));
+}
