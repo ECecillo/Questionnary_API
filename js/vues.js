@@ -104,7 +104,7 @@ function renderQuizzes() {
 
 
   //Parcours json response
-  function maj_url (url_data) {
+  function maj_url(url_data) {
     const title = url_data.map((contenu, indx) => ({
       titre: desc.title,
       descript: desc.description,
@@ -121,21 +121,21 @@ function renderQuizzes() {
     console.debug(`@clickQuiz(${quizzId})`);
     const addr = `${state.serverUrl}/quizzes/${quizzId}`;
     const quest = `${state.serverUrl}/quizzes/${quizzId}/questions`;
-    return fetch(addr,{method:'GET',headers:state.headers()})
+    return fetch(addr, { method: 'GET', headers: state.headers() })
       .then(filterHttpResponse)
-      .then((data)=>{
+      .then((data) => {
         state.currentQuizz = data;
         console.log(state.currentQuizz);
-        return fetch(quest,{method:'GET',headers:state.headers()})
+        return fetch(quest, { method: 'GET', headers: state.headers() })
           .then(filterHttpResponse)
-          .then((data)=>{
-            state.quizzes=data;
+          .then((data) => {
+            state.quizzes = data;
             renderCurrentQuizz();
           });
-    // eslint-disable-next-line no-use-before-define
+        // eslint-disable-next-line no-use-before-define
         return renderCurrentQuizz();
       });
-    };
+  };
 
   // pour chaque quizz, on lui associe son handler
   quizzes.forEach((q) => {
@@ -143,33 +143,40 @@ function renderQuizzes() {
   });
 }
 
+
 function renderCurrentQuizz() {
-  var quest='';
-  for(var i=0;i<state.quizzes.length;i++){
-    quest+= state.quizzes[i].sentence;
-    quest+='<br/>';
-    for(var j=0;j<state.quizzes[i].propositions_number;j++){
-      quest+=state.quizzes[i].propositions[j].content;
-      quest+="<input type="radio" id="huey" name="drone" value="huey"
-      checked>
-<label for="huey">Huey</label>";
-    }
-    quest+='<br/>';
-  }
-  console.log(quest);
+  var quest = '';
+  const propo = document.getElementById('content-propo');
   const main = document.getElementById('id-all-quizzes-main');
-  const quest_propo = document.getElementById('quest_propo');
-  
-  main.innerHTML = `<div class="card indigo lighten-5">
+
+  main.innerHTML += `<div class="card indigo lighten-5">
         <div class="card-content black-text">
           <span class="card-title">${state.currentQuizz.title}</span>
             <p>Créer le ${state.currentQuizz.created_at} par <a class="chip"> ${state.currentQuizz.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
             <p>description: ${state.currentQuizz.description}</p> <br>
-            <form id="quest_propo">
-              ${quest}
+            <form action="#">
+              <p id="content-propo">
+              </p>
             </form>
         </div>
       </div>`;
+
+
+  for (var i = 0; i < state.quizzes.length; i++) {
+    quest += state.quizzes[i].sentence;
+    quest += '<br/>';
+    for (var j = 0; j < state.quizzes[i].propositions_number; j++) {
+      quest += state.quizzes[i].propositions[j].content;
+      propo.innerHTML = `
+      <label>
+        <input type="checkbox" />
+        <span>${quest}</span>
+    </label>`;
+    }
+    quest += '<br/>';
+  }
+  console.log(quest);
+
 }
 
 
@@ -187,7 +194,7 @@ const renderUserBtn = () => {
       document.getElementById('content-logout').innerHTML +=
         `<h5> ${state.user.lastname.toUpperCase()} ${state.user.firstname} (${state.user.user_id}) <br />
         Vous êtes l'auteur de </h5>`;
-      document.getElementById('id-logout').onclick = function() {
+      document.getElementById('id-logout').onclick = function () {
         state.xApiKey = '';
         getUser();
         document.location.reload(true);
