@@ -154,9 +154,8 @@ function getQuizzData(id) {
   console.debug(`@getQuizzData(${id})`);
   const url = `${state.serverUrl}/quizzes/${id}/questions`;
 
-  return fetch(url, { method: "GET", headers: state.headers() }).then(
-    filterHttpResponse
-  );
+  return fetch(url, { method: "GET", headers: state.headers() })
+  .then(filterHttpResponse);
 }
 
 // /!\ Va chercher toutes les infos d'un quizz avec son id, on a ces réponses ect ... /!\

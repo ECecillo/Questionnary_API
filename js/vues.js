@@ -18,7 +18,6 @@ const htmlQuizzesList = (quizzes, curr, total) => {
   const quizzesLIst = quizzes.map(
     (q) =>
       `<li class="collection-item cyan lighten-5" data-quizzid="${q.quiz_id}">
->>>>>>> Afficher_questions_propo
         <h5>${q.title}</h5>
         ${q.description} <a class="chip">${q.owner_id}</a>
       </li>`
@@ -75,7 +74,7 @@ const htmlQuizzesListContent = (quiz, answers) => {
   const Question = (questions, answers, disabled) =>
     questions.map(
       (q) =>
-        `<p>${q.sentence}</p>
+        `<h6>${q.sentence}</h6>
         ${Propositions(
           q.propositions,
           q.question_id,
@@ -118,13 +117,15 @@ const htmlQuizzesListContent = (quiz, answers) => {
     ${checkValidate(quiz, answers)} 
   </form>`;
 
+  var date = quiz.info.created_at;
+  date = new Date(date).toLocaleString();
   // /!\ L'html qui sera mis dans RenderCurrentQuiz pour afficher le titre, desc ... /!\
   const Quizhtml = `
   <div class="card indigo lighten-5">
     <div class="card-content black-text">
       <span class="card-title">${quiz.info.title}</span>
-        <p>Créer le ${quiz.info.created_at} par <a class="chip"> ${quiz.info.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
-        <p>description: ${quiz.info.description}</p> <br>
+        <p>Créer le ${date} par <a class="chip"> ${quiz.info.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
+        <p>${quiz.info.description}</p> <br>
           <form id="quizz" data-id="${quiz.info.quiz_id}">
             ${Question(quiz.questions, answers, !noDisabled || noSubmit).join("<br>")}
             ${checkValidate(quiz, answers)} 
@@ -267,7 +268,7 @@ function renderUserQuizzes() {
 function renderCurrentQuizz(data) {
   console.debug(`@renderCurrentQuizz()`);
   const main = document.getElementById('id-all-quizzes-main');
-
+  console.debug(`@(${data.created_at})`);
   if (data === undefined) {
     main.innerHTML = "Pas de data";
   }
@@ -275,20 +276,6 @@ function renderCurrentQuizz(data) {
     main.innerHTML = htmlQuizzesListContent(data);
   }
 
-}
-
-function renderCurrentUserQuizz() {
-  const mainUsers = document.getElementById('id-my-quizzes-main');
-
-  // Partie affichage des quiz de l'utilisateur
-
-  mainUsers.innerHTML = `<div class="card indigo lighten-5">
-        <div class="card-content black-text">
-          <span class="card-title">${state.quizzes.title}</span>
-            <p>Créer le ${state.quizzes.created_at} par <a class="chip"> VOUS <i class="Small material-icons">account_circle</i> </a></p>    
-            <p>description: ${state.quizzes.description}</p>
-        </div> 
-      </div>`;
 }
 
 
