@@ -159,9 +159,9 @@ function renderCurrentQuizz() {
 
   main.innerHTML = `<div class="card indigo lighten-5">
         <div class="card-content black-text">
-          <span class="card-title">${state.quizzes.title}</span>
-            <p>Créer le ${state.quizzes.created_at} par <a class="chip"> ${state.quizzes.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
-            <p>description: ${state.quizzes.description}</p>
+          <span class="card-title">${state.currentQuizz.title}</span>
+            <p>Créer le ${state.currentQuizz.created_at} par <a class="chip"> ${state.quizzes.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
+            <p>description: ${state.currentQuizz.description}</p>
             <form class="quest_propo">
 
             </form>
