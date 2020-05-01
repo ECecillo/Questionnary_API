@@ -17,11 +17,12 @@ const htmlQuizzesList = (quizzes, curr, total) => {
   // data-target="id-modal-quizz-menu"
   const quizzesLIst = quizzes.map(
     (q) =>
-      `<li class="collection-item cyan lighten-5" data-quizzid="${q.quiz_id}"> 
+      `<li class="collection-item cyan lighten-5" data-quizzid="${q.quiz_id}">
+>>>>>>> Afficher_questions_propo
         <h5>${q.title}</h5>
         ${q.description} <a class="chip">${q.owner_id}</a>
       </li>`
-  );
+  ); /* modal-trigger data-target="id-modal-quizz-menu" */
 
   // le bouton "<" pour revenir à la page précédente, ou rien si c'est la première page
   // on fixe une donnée data-page pour savoir où aller via JS via element.dataset.page
@@ -49,6 +50,88 @@ const htmlQuizzesList = (quizzes, curr, total) => {
   </div>
   `;
   return html;
+};
+
+const htmlQuizzesListContent = (quiz, answers) => {
+  console.debug(`@htmlQuizzesListContent(${quiz})`);
+
+  // /!\ Génère les radios pour les réponses /!\
+  //prop : quizzes.proposition
+  //id: quizzes.quiz_id pour récup l'id du quiz
+  //answer: les réponses qui sont dans la requpête
+  const Propositions = (prop, id, answer, disabled) =>
+    prop.map((p) => {
+      return `<label>
+              <input type="radio" name="${id}" value="${p.proposition_id}" ${
+        disabled ? "disabled" : ""} 
+              ${answer !== undefined && answer.p === p.proposition_id ? "checked" : ""}>
+              <span>${p.content}</span>
+           </label>`;
+    });
+
+  // /!\ Pour chaque question on parcours les propositions /!\
+  // question: state.currentQuizzes
+  // answers: 
+  const Question = (questions, answers, disabled) =>
+    questions.map(
+      (q) =>
+        `<p>${q.sentence}</p>
+        ${Propositions(
+          q.propositions,
+          q.question_id,
+          answers !== undefined
+            ? answers.find((elt) => elt.q === q.question_id)
+            : undefined,
+          disabled
+        ).join("")}`
+    );
+  //On déclare ces deux consantes qui serviront pour l'évalution du submit
+  const noDisabled = quiz.info.open && state.user !== undefined;
+  const noSubmit =
+    state.user !== undefined && quiz.info.owner_id === state.user.user_id;
+  // /!\ Fonction qui contient toute les conditions qui doivennt être remplis pour le submit /!\
+  // quiz: le tableau du quiz que l'utilisateur à choisi
+  function checkValidate(quiz) {
+    const btnDisplay = !quiz.info.open
+      ? "Quiz fermé"
+      : state.user === undefined
+        ? "Utilisateur non connecté"
+        : "Répondre";
+
+    return RenderSubButt(noSubmit, noDisabled, btnDisplay);
+  }
+  // /!\ Vérifie si le bouton valider a été soumis par l'user /!\
+  function RenderSubButt(noSub, noDisab, idBtn) {
+    if (noSub) {
+      return "";
+    }
+    else {
+      return `</br>
+    <input type="submit" value="${idBtn}" class="btn" id="btn-submit"
+    ${ noDisab ? "" : "disabled"}>`;
+    }
+  }
+  // /!\ Html du form qui sera mis dans Quizhtml pour le renderQuiz /!\
+  const FormQuiz = `
+  <form id="quizz" data-id="${quiz.info.quiz_id}">
+    ${Question(quiz.questions, answers, !noDisabled || noSubmit).join("<br>")}
+    ${checkValidate(quiz, answers)} 
+  </form>`;
+
+  // /!\ L'html qui sera mis dans RenderCurrentQuiz pour afficher le titre, desc ... /!\
+  const Quizhtml = `
+  <div class="card indigo lighten-5">
+    <div class="card-content black-text">
+      <span class="card-title">${quiz.info.title}</span>
+        <p>Créer le ${quiz.info.created_at} par <a class="chip"> ${quiz.info.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
+        <p>description: ${quiz.info.description}</p> <br>
+          <form id="quizz" data-id="${quiz.info.quiz_id}">
+            ${Question(quiz.questions, answers, !noDisabled || noSubmit).join("<br>")}
+            ${checkValidate(quiz, answers)} 
+          </form>
+    </div>
+  </div>`;
+  return Quizhtml;
 };
 
 // //////////////////////////////////////////////////////////////////////////////
@@ -90,48 +173,30 @@ function renderQuizzes() {
   if (prevBtn) prevBtn.onclick = clickBtnPager;
   if (nextBtn) nextBtn.onclick = clickBtnPager;
 
+
+  //Parcours json response
+  function maj_url(url_data) {
+    const title = url_data.map((contenu, indx) => ({
+      titre: desc.title,
+      descript: desc.description,
+    }));
+
+  }
+
+
   // qd on clique sur un quizz, on change sont contenu avant affichage
   // l'affichage sera automatiquement déclenché par materializecss car on
   // a définit .modal-trigger et data-target="id-modal-quizz-menu" dans le HTML
   function clickQuiz() {
     const quizzId = this.dataset.quizzid;
     console.debug(`@clickQuiz(${quizzId})`);
-    const addr = `${state.serverUrl}/quizzes/${quizzId}`;
-
     state.currentQuizz = quizzId;
-    
-    // télécharge le contenu du quiz aved l'id quizzId
-    return fetch(addr, { method: 'GET', headers: state.headers() })
-      .then(filterHttpResponse)
-      .then((data) => {
-        state.quizzes = data; // C'est dans quizzes qu'on récup le nombre de question et donc l'id question.
-        
-        state.quizzes.questions_ids.forEach(qid => {
-          var question_addr = `${state.serverUrl}/quizzes/${quizzId}/questions/${qid}`;
 
-          return fetch(question_addr, { method: 'GET', headers: state.headers() })
-          .then(filterHttpResponse)
-          .then((data) => {
-              const question_prop = data.map (
-                q => 
-                  `<form>
-                    <div>
-                      <label>${q.sentence}</label>
-                      <div>
-                        <input>
-                        <label>${q.proposition[].content}</label>
-                      </div>
-                    </div>
-                  </form>`
-                );
-
-            }
-          ) 
-        });
-        
-         renderCurrentQuizz();
-      });
-  }
+    return getQuizzData(quizzId).then((data) => {
+      const Info = state.quizzes.results.find((e) => e.quiz_id === Number(quizzId));
+      return renderCurrentQuizz({ info: Info, questions: data });
+    });
+  };
 
   // pour chaque quizz, on lui associe son handler
   quizzes.forEach((q) => {
@@ -198,17 +263,17 @@ function renderUserQuizzes() {
   });
 }
 
-function renderCurrentQuizz() {
-  const main = document.getElementById('id-all-quizzes-main');
-  const mainUsers = document.getElementById('id-my-quizzes-main');
 
-  main.innerHTML = `<div class="card indigo lighten-5">
-        <div class="card-content black-text">
-          <span class="card-title">${state.quizzes.title}</span>
-            <p>Créer le ${state.quizzes.created_at} par <a class="chip"> ${state.quizzes.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
-            <p>description: ${state.quizzes.description}</p>
-        </div>
-      </div>`;
+function renderCurrentQuizz(data) {
+  console.debug(`@renderCurrentQuizz()`);
+  const main = document.getElementById('id-all-quizzes-main');
+
+  if (data === undefined) {
+    main.innerHTML = "Pas de data";
+  }
+  else {
+    main.innerHTML = htmlQuizzesListContent(data);
+  }
 
 }
 
