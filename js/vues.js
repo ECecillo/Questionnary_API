@@ -172,7 +172,7 @@ function renderQuizzes() {
   ul.className = "collection-item modal-trigger cyan lighten-5";
   let bouton=document.createElement('button');
   bouton.className="waves-effect waves-light btn black-text cyan lighten-4";
-  bouton.onclick=()=>createNewQuiz();
+  bouton.onclick=()=>NewQuiz();
   bouton.innerHTML="Nouveau Quizz";
   ul.appendChild(bouton);
   let collection=document.getElementById('collection');
@@ -334,16 +334,20 @@ function renderUserQuizzes(quizz) {
 // ainsi que leurs questions. Mais cette fois pour les quizzes de l'utilisateur
 function renderCurrentUserQuizz(quizz) {
   console.debug(`@renderCurrentQuizz()`);
-  const main = document.getElementById('id-his-quizzes-main');
+  const main = document.getElementById('id-all-quizzes-main');
   console.debug(`@(${quizz.created_at})`);
   // On gère si il y a bien des données à afficher
   if (quizz === undefined) {
     main.innerHTML = "Pas de data";
   }
   else {
-    main.innerHTML = htmlQuizzesListContent(quizz);
-    
-    const code=`
+    main.innerHTML = htmlQuizzesListContent(quizz);    
+  }
+}
+
+function NewQuiz () {
+  const main = document.getElementById("");
+  const code=`
     <h4>Modifier le quizz<h4><br>
     <form id="form_user>
       <label>Question 
@@ -352,20 +356,17 @@ function renderCurrentUserQuizz(quizz) {
       <label>Réponses<input placeholder='Réponse 1' name='1' type='text' class='validate' required></br>
         <input placeholder='Réponse 2' name='2' type='text' class='validate'>
       </label>
-      <button class='waves-effect waves-light btn' id='create_quiz'>Modifier le quizz</button>
+      <button class='waves-effect waves-light btn' id='modif_quiz'>Modifier le quizz</button>
     </form>`;
     main.innerHTML=code;
     document.querySelector(
       "#id-his-quizzes-main #form_user"
-    ).onsubmit = function submitForm(ev) {
+    ).onsubmit = function createForm(ev) {
       ev.preventDefault();
       const form = document.getElementById("form_user");
-      sendQuizz(form);
+      CreateQuizz(form);
     };
-    
-  }
 }
-
 
 function renderAnswQuizzes () {
   console.debug(`@renderAnswQuizzes()`);
