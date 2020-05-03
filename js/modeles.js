@@ -107,22 +107,6 @@ const getUserQuizzes = (p = 1) => {
     .then(filterHttpResponse)
     .then(renderUserQuizzes);
 };
-// Converti
-const pad2digits = (n) => {
-  if(n >= 0 && n < 10) {
-    return `0${n}`;
-  }
-  else {
-    return n;
-  }
-};
-
-const parseDate = (d) => {
-  return {
-    date: `${pad2digits(d.getDate())}/${pad2digits( d.getMonth() + 1)}/${d.getFullYear()}`,
-    time: `${pad2digits(d.getHours())}:${pad2digits( d.getMinutes())}:${pad2digits(d.getSeconds())}`,
-  };
-};
 
 // mise-à-jour asynchrone de l'état avec les informations de l'utilisateur
 // getQuizzes télécharge la page 'p' des quizzes et la met dans l'état
@@ -135,15 +119,7 @@ const getAnswQuizzes = (p = 1) => {
   // le téléchargement est asynchrone, là màj de l'état et le rendu se fait dans le '.then'
   return fetch(url, { method: 'GET', headers: state.headers() })
     .then(filterHttpResponse)
-    .then((data) => {
-      // /!\ ICI L'ETAT EST MODIFIE /!\
-      state.quizzes = data;
-
-      // on a mis à jour les donnés, on peut relancer le rendu
-      // eslint-disable-next-line no-use-before-define
-
-      return renderAnswQuizzes();
-    });
+    .then(renderAnswQuizzes());
 };
 
 // /!\ Télécharge le quiz avec les infos général /!\
@@ -206,7 +182,7 @@ const sendQuizz = (Sform) => { // form
     return (fetch(url, { method: "POST", headers: state.headers() })
       .then(filterHttpResponse)
       .then((res) => {
-        /* const date = parseDate(new Date(res.answered_at));
+        const date = new Date(res.answered_at).toLocaleString();
         const toast = M.toast({
           html: `La question ${res.question_id} du quiz d'identifiant ${res.quiz_id} à été validé à ${date}`,
           classes: "toast-update",
@@ -214,7 +190,7 @@ const sendQuizz = (Sform) => { // form
         }).el;
         toast.el.onclick = function dismiss() {
           toast.timeRemaining = 0;
-        }; */
+        };
         return res;
       })
     );

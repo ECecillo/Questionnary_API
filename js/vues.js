@@ -54,6 +54,17 @@ const htmlQuizzesList = (quizzes, curr, total) => {
 const htmlQuizzesListContent = (quiz, answers) => {
   console.debug(`@htmlQuizzesListContent(${quiz})`);
 
+  //Fonction qui va s'occuper de cocher les bonnes réponses pour l'affichage des réponses
+ function checkAnsw (answer, proposition) {
+    if(answer !== undefined && answer.p === proposition.proposition_id) {
+      return "checked";
+    }
+    else {
+      return "";
+    }
+  }
+
+
   // /!\ Génère les radios pour les réponses /!\
   //prop : quizzes.proposition
   //id: quizzes.quiz_id pour récup l'id du quiz
@@ -62,8 +73,7 @@ const htmlQuizzesListContent = (quiz, answers) => {
     prop.map((p) => {
       return `<label>
               <input type="radio" name="${id}" value="${p.proposition_id}" ${
-        disabled ? "disabled" : ""} 
-              ${answer !== undefined && answer.p === p.proposition_id ? "checked" : ""}>
+        disabled ? "disabled" : ""} ${checkAnsw(answer,prop)}>
               <span>${p.content}</span>
            </label>`;
     });
@@ -278,32 +288,65 @@ function renderCurrentUserQuizz(quizz) {
   }
 }
 
+
+function renderAnswQuizzes () {
+  console.debug(`@renderAnswQuizzes()`);
+
+  // les éléments à mettre à jour : le conteneur pour la liste des quizz de l'user
+  const usersElt = document.getElementById("id-my-answers-list");
+  const main = document.getElementById("id-my-answers-main");
+
+  if (quizz === undefined) {
+    usersElt.innerHTML = "<p style='color: crimson;'>Vous n'avez pas de quiz, veuillez vérifier votre connexion</p>";
+  } else {
+    usersElt.innerHTML = QuizzUtilisateur(quizz);
+  }
+
+  main.innerHTML = "Pas de quiz séléctioné";
+
+  const quizzElt = document.querySelectorAll("#id-my-quizzes-list li");
+
+  function clickQuizz() {
+    const quizzId = this.dataset.quizzid;
+    return getQuizzData(quizzId).then((quizzData) => { //On récupère les infos du quizz
+      const quizzInfo = quizz.find(e => e.quiz_id === Number(quizzId));
+      return AnswQuizz(quizzData, quizzAnsw)
+    });
+  }
+
+  quizzElt.forEach((q) => {
+    q.onclick = clickQuizz;
+  });
+}
+
 // quand on clique sur le bouton de login, il nous dit qui on est
 // eslint-disable-next-line no-unused-vars
 const renderUserBtn = () => {
-  console.debug('@renderUserBtn()');
   const btn = document.getElementById('id-login');
-
   btn.onclick = () => {
     if (state.user) {
+      // eslint-disable-next-line no-alert
+      /* alert(
+        `Bonjour ${state.user.firstname} ${state.user.lastname.toUpperCase()}` 
+      ); */
+      getUser();
       document.getElementById('content-logout').innerHTML =
         `<h5> ${state.user.lastname.toUpperCase()} ${state.user.firstname} (${state.user.user_id}) <br />
         Vous êtes l'auteur de </h5>`;
-      document.getElementById('id-logout').onclick = function () {
+      document.getElementById('id-logout').onclick = function() {
         state.xApiKey = '';
-        //getUser();
+        getUser();
         document.location.reload(true);
       }
 
     } else {
       const saisie = document.getElementById('api').value;
       state.xApiKey = saisie;
-
-      if (state.xApiKey !== "") {
-        document.getElementById('confirm-message').innerHTML += '<h5 style="color:green;">Connecté !</h5>';
+      getUser();
+      if (state.xApiKey != "") {
+        document.getElementById('confirm-message').innerHTML = '<h5 style="color:green;">Connecté !</h5>';
         document.getElementById('login').remove();
-        document.getElementById('log').innerHTML += '<a class="waves-effect waves-light btn modal-trigger" id="id-login" href="#modal2"><i class="Large material-icons">keyboard_backspace</i></a>';
-        getUser();
+        document.getElementById('log').innerHTML = '<a class="waves-effect waves-light btn modal-trigger" id="id-login" href="#modal2"><i class="Large material-icons">keyboard_backspace</i></a>';
         getUserQuizzes(state.quizz);
       }
       else {
@@ -313,4 +356,3 @@ const renderUserBtn = () => {
     }
   };
 };
-
