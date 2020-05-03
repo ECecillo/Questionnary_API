@@ -332,11 +332,17 @@ function renderCurrentUserQuizz(quizz) {
   }
   else {
     main.innerHTML = htmlQuizzesListContent(quizz);
-    let code="<h4>Modifier le quizz<h4><br>";
-		code+="<form><label>Question <input placeholder='Votre question' name='question' type='text' class='validate' required></label>";
-    code+="<label>Réponses<input placeholder='Réponse 1' name='1' type='text' class='validate' required></br><input placeholder='Réponse 2' name='2' type='text' class='validate'></label></form>";
-    //code+="<label>Question :<input placeholder='Question de votre quiz' id='question' type='text' class='validate'></label>";     Là il faudrait pouvoir choisir le nombre de questions du quizz
-		code+="<button class='waves-effect waves-light btn' id='create_quiz'>Modifier le quizz</button>";
+    const code=`
+    <h4>Modifier le quizz<h4><br>;
+    <form>
+      <label>Question 
+        <input placeholder='Votre question' name='question' type='text' class='validate' required>
+      </label>
+      <label>Réponses<input placeholder='Réponse 1' name='1' type='text' class='validate' required></br>
+        <input placeholder='Réponse 2' name='2' type='text' class='validate'>
+      </label>
+      <button class='waves-effect waves-light btn' id='create_quiz'>Modifier le quizz</button>
+    </form>`;
     main.innerHTML=code;
   }
 }
