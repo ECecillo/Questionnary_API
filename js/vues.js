@@ -17,7 +17,7 @@ const htmlQuizzesList = (quizzes, curr, total) => {
   // data-target="id-modal-quizz-menu"
   const quizzesLIst = quizzes.map(
     (q) =>
-      `<li class="collection-item cyan lighten-5" data-quizzid="${q.quiz_id}">
+      `<li class="hoverable collection-item cyan lighten-5" data-quizzid="${q.quiz_id}">
         <h5>${q.title}</h5>
         ${q.description} <a class="chip">${q.owner_id}</a>
       </li>`
@@ -86,8 +86,7 @@ const htmlQuizzesListContent = (quiz, answers) => {
     );
   //On déclare ces deux consantes qui serviront pour l'évalution du submit
   const noDisabled = quiz.info.open && state.user !== undefined;
-  const noSubmit =
-    state.user !== undefined && quiz.info.owner_id === state.user.user_id;
+  const noSubmit = state.user !== undefined && quiz.info.owner_id === state.user.user_id;
   // /!\ Fonction qui contient toute les conditions qui doivennt être remplis pour le submit /!\
   // quiz: le tableau du quiz que l'utilisateur à choisi
   function checkValidate(quiz) {
@@ -99,6 +98,17 @@ const htmlQuizzesListContent = (quiz, answers) => {
 
     return RenderSubButt(noSubmit, noDisabled, btnDisplay);
   }
+
+  //Créer un toast quand on cliquera sur le bouton submit.
+  /* const date_sub = parseDate(new Date(quiz.answered_at));
+  const toast = M.toast({
+    html: `La question ${quiz.question_id} du quiz d'identifiant ${quiz.quiz_id} à été validé à ${date_sub}`,
+    classes: "toast-update",
+    displayLength: 5000,
+  }).el;
+  toast.onclick = function dismiss() {
+    toast.timeRemaining = 0;
+  }; */
   // /!\ Vérifie si le bouton valider a été soumis par l'user /!\
   function RenderSubButt(noSub, noDisab, idBtn) {
     if (noSub) {
@@ -107,16 +117,9 @@ const htmlQuizzesListContent = (quiz, answers) => {
     else {
       return `</br>
     <input type="submit" value="${idBtn}" class="btn" id="btn-submit"
-    ${ noDisab ? "" : "disabled"}>`;
+    ${ noDisab ? "" : "disabled"} onclick="">`;
     }
   }
-  // /!\ Html du form qui sera mis dans Quizhtml pour le renderQuiz /!\
-  const FormQuiz = `
-  <form id="quizz" data-id="${quiz.info.quiz_id}">
-    ${Question(quiz.questions, answers, !noDisabled || noSubmit).join("<br>")}
-    ${checkValidate(quiz, answers)} 
-  </form>`;
-
   var date = quiz.info.created_at;
   date = new Date(date).toLocaleString();
   // /!\ L'html qui sera mis dans RenderCurrentQuiz pour afficher le titre, desc ... /!\
@@ -126,7 +129,7 @@ const htmlQuizzesListContent = (quiz, answers) => {
       <span class="card-title">${quiz.info.title}</span>
         <p>Créer le ${date} par <a class="chip"> ${quiz.info.owner_id} <i class="Small material-icons">account_circle</i> </a></p>    
         <p>${quiz.info.description}</p> <br>
-          <form id="quizz" data-id="${quiz.info.quiz_id}">
+          <form id="quizz_content" data-id="${quiz.info.quiz_id}">
             ${Question(quiz.questions, answers, !noDisabled || noSubmit).join("<br>")}
             ${checkValidate(quiz, answers)} 
           </form>
@@ -205,66 +208,6 @@ function renderQuizzes() {
   });
 }
 
-function renderUserQuizzes() {
-  console.debug(`@renderUsersQuizzes()`);
-
-  // les éléments à mettre à jour : le conteneur pour la liste des quizz
-  const usersQuiz = document.getElementById('id-my-quizzes-list');
-
-  // on appelle la fonction de généraion et on met le HTML produit dans le DOM
-  usersQuiz.innerHTML = htmlQuizzesList(
-    state.quizzes,
-    state.quizzes.currentPage,
-    state.quizzes.nbPages
-  );
-
-  // /!\ il faut que l'affectation usersElt.innerHTML = ... ait eu lieu pour
-  // /!\ que prevBtn, nextBtn et quizzes en soient pas null
-  // les éléments à mettre à jour : les boutons
-  const prevBtn = document.getElementById('id-prev-quizzes');
-  const nextBtn = document.getElementById('id-next-quizzes');
-  // la liste de tous les quizzes individuels
-  const quizzes = document.querySelectorAll('#id-my-quizzes-list li');
-
-  // les handlers quand on clique sur "<" ou ">"
-  function clickBtnPager() {
-    // remet à jour les données de state en demandant la page
-    // identifiée dans l'attribut data-page
-    // noter ici le 'this' QUI FAIT AUTOMATIQUEMENT REFERENCE
-    // A L'ELEMENT AUQUEL ON ATTACHE CE HANDLER
-    getUserQuizzes(this.dataset.page);
-  }
-  if (prevBtn) prevBtn.onclick = clickBtnPager;
-  if (nextBtn) nextBtn.onclick = clickBtnPager;
-
-  // qd on clique sur un quizz, on change sont contenu avant affichage
-  // l'affichage sera automatiquement déclenché par materializecss car on
-  // a définit .modal-trigger et data-target="id-modal-quizz-menu" dans le HTML
-  function clickQuizUser() {
-    const quizzId = this.dataset.quizzid;
-    console.debug(`@clickUserQuiz(${quizzId})`);
-    const addr = `${state.serverUrl}/quizzes/${quizzId}`;
-    const question = `${state.serverUrl}/quizzes/${quizzId}/`
-
-
-    state.currentQuizz = quizzId;
-    // télécharge le contenu du quiz aved l'id quizzId
-    return fetch(addr, { method: 'GET', headers: state.headers() })
-      .then(filterHttpResponse)
-      .then((data) => {
-        state.quizzes = data;
-
-        return renderCurrentUserQuizz();
-      });
-  }
-
-  // pour chaque quizz, on lui associe son handler
-  quizzes.forEach((q) => {
-    q.onclick = clickQuizUser;
-  });
-}
-
-
 function renderCurrentQuizz(data) {
   console.debug(`@renderCurrentQuizz()`);
   const main = document.getElementById('id-all-quizzes-main');
@@ -274,11 +217,66 @@ function renderCurrentQuizz(data) {
   }
   else {
     main.innerHTML = htmlQuizzesListContent(data);
+    document.querySelector(
+      "#id-all-quizzes-main #quizz_content"
+    ).onsubmit = function submitForm(ev) {
+      ev.preventDefault();
+      const form = document.getElementById("quizz_content");
+      sendQuizz(form);
+    };
   }
-
 }
 
+const QuizzUtilisateur = (quizzes) => {
+  console.debug("@htmlUserQuizzes()");
 
+  const quizzesList = htmlQuizzesList(quizzes);
+
+  return quizzesList;
+};
+
+
+function renderUserQuizzes(quizz) {
+  console.debug(`@renderUserQuizzes()`);
+
+  // les éléments à mettre à jour : le conteneur pour la liste des quizz de l'user
+  const usersElt = document.getElementById("id-my-quizzes-list");
+  const main = document.getElementById("id-my-quizzes-main");
+
+  if (quizz === undefined) {
+    usersElt.innerHTML = "Vous n'avez pas de quiz, veuillez vérifier votre connexion";
+  } else {
+    usersElt.innerHTML = QuizzUtilisateur(quizz);
+  }
+
+  main.innerHTML = "Pas de quiz séléctioné";
+
+  const quizzElt = document.querySelectorAll("#id-my-quizzes-list li");
+
+  function clickQuizz() {
+    const quizzId = this.dataset.quizzid;
+    return getQuizzData(quizzId).then((quizzData) => { //On récupère les infos du quizz
+      const quizzInfo = quizz.find(e => e.quiz_id === Number(quizzId));
+      return renderCurrentUserQuizz({ info: quizzInfo, questions: quizzData })
+    });
+  }
+
+  quizzElt.forEach((q) => {
+    q.onclick = clickQuizz;
+  });
+}
+
+function renderCurrentUserQuizz(quizz) {
+  console.debug(`@renderCurrentQuizz()`);
+  const main = document.getElementById('id-my-quizzes-main');
+  console.debug(`@(${quizz.created_at})`);
+  if (quizz === undefined) {
+    main.innerHTML = "Pas de data";
+  }
+  else {
+    main.innerHTML = htmlQuizzesListContent(quizz);
+  }
+}
 
 // quand on clique sur le bouton de login, il nous dit qui on est
 // eslint-disable-next-line no-unused-vars
@@ -288,9 +286,7 @@ const renderUserBtn = () => {
 
   btn.onclick = () => {
     if (state.user) {
-      document.getElementById('login').remove();
-      document.getElementById('log').innerHTML += '<a class="waves-effect waves-light btn modal-trigger" id="id-login" href="#modal2"><i class="Large material-icons">keyboard_backspace</i></a>';
-      document.getElementById('content-logout').innerHTML +=
+      document.getElementById('content-logout').innerHTML =
         `<h5> ${state.user.lastname.toUpperCase()} ${state.user.firstname} (${state.user.user_id}) <br />
         Vous êtes l'auteur de </h5>`;
       document.getElementById('id-logout').onclick = function () {
@@ -308,7 +304,7 @@ const renderUserBtn = () => {
         document.getElementById('login').remove();
         document.getElementById('log').innerHTML += '<a class="waves-effect waves-light btn modal-trigger" id="id-login" href="#modal2"><i class="Large material-icons">keyboard_backspace</i></a>';
         getUser();
-        getUserQuizzes();
+        getUserQuizzes(state.quizz);
       }
       else {
         document.getElementById('confirm-message').innerHTML += '<h5 style="color:crimson;">Veuillez vérifier votre saisie !</h5>';

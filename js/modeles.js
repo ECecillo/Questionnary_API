@@ -79,7 +79,7 @@ const getUser = () => {
 const getQuizzes = (p = 1) => {
   console.debug(`@getQuizzes(${p})`);
   const url = `${state.serverUrl}/quizzes/?page=${p}`;
-  
+
   // le téléchargement est asynchrone, là màj de l'état et le rendu se fait dans le '.then'
   return fetch(url, { method: 'GET', headers: state.headers() })
     .then(filterHttpResponse)
@@ -89,7 +89,7 @@ const getQuizzes = (p = 1) => {
 
       // on a mis à jour les donnés, on peut relancer le rendu
       // eslint-disable-next-line no-use-before-define
-      
+
       return renderQuizzes();
     });
 };
@@ -101,19 +101,27 @@ const getQuizzes = (p = 1) => {
 const getUserQuizzes = (p = 1) => {
   console.debug(`@getUserQuizzes`);
   const url = `${state.serverUrl}/users/quizzes`;
-  
+
   // le téléchargement est asynchrone, là màj de l'état et le rendu se fait dans le '.then'
   return fetch(url, { method: 'GET', headers: state.headers() })
     .then(filterHttpResponse)
-    .then((data) => {
-      // /!\ ICI L'ETAT EST MODIFIE /!\
-      state.quizzes = data;
+    .then(renderUserQuizzes);
+};
+// Converti
+const pad2digits = (n) => {
+  if(n >= 0 && n < 10) {
+    return `0${n}`;
+  }
+  else {
+    return n;
+  }
+};
 
-      // on a mis à jour les donnés, on peut relancer le rendu
-      // eslint-disable-next-line no-use-before-define
-      
-      return renderUserQuizzes();
-    });
+const parseDate = (d) => {
+  return {
+    date: `${pad2digits(d.getDate())}/${pad2digits( d.getMonth() + 1)}/${d.getFullYear()}`,
+    time: `${pad2digits(d.getHours())}:${pad2digits( d.getMinutes())}:${pad2digits(d.getSeconds())}`,
+  };
 };
 
 // mise-à-jour asynchrone de l'état avec les informations de l'utilisateur
@@ -123,7 +131,7 @@ const getUserQuizzes = (p = 1) => {
 const getAnswQuizzes = (p = 1) => {
   console.debug(`@getAnswQuizzes`);
   const url = `${state.serverUrl}/users/answers`;
-  
+
   // le téléchargement est asynchrone, là màj de l'état et le rendu se fait dans le '.then'
   return fetch(url, { method: 'GET', headers: state.headers() })
     .then(filterHttpResponse)
@@ -133,7 +141,7 @@ const getAnswQuizzes = (p = 1) => {
 
       // on a mis à jour les donnés, on peut relancer le rendu
       // eslint-disable-next-line no-use-before-define
-      
+
       return renderAnswQuizzes();
     });
 };
@@ -155,7 +163,7 @@ function getQuizzData(id) {
   const url = `${state.serverUrl}/quizzes/${id}/questions`;
 
   return fetch(url, { method: "GET", headers: state.headers() })
-  .then(filterHttpResponse);
+    .then(filterHttpResponse);
 }
 
 // /!\ Va chercher toutes les infos d'un quizz avec son id, on a ces réponses ect ... /!\
@@ -180,3 +188,37 @@ function getInfoData(id) {
     )
     .catch((err) => console.error(`Erreur: ${err}`));
 }
+
+// envoie les réponses à un quizz au serveur
+// form est l'objet formData du quizz à envoyer
+// eslint-disable-next-line no-unused-vars
+const sendQuizz = (Sform) => { // form
+  const form = new FormData(Sform);
+  const quiz_id = document.getElementById("quizz_content").dataset.id;
+
+  console.debug(`@SendQuiz(${form})`);
+
+  const A = Array.from(form);
+
+  Promise.all(A.map((pa) => {
+    const url = `${state.serverUrl}/quizzes/${quiz_id}/questions/${pa[0]}/answers/${pa[1]}`;
+
+    return (fetch(url, { method: "POST", headers: state.headers() })
+      .then(filterHttpResponse)
+      .then((res) => {
+        /* const date = parseDate(new Date(res.answered_at));
+        const toast = M.toast({
+          html: `La question ${res.question_id} du quiz d'identifiant ${res.quiz_id} à été validé à ${date}`,
+          classes: "toast-update",
+          displayLength: 5000,
+        }).el;
+        toast.el.onclick = function dismiss() {
+          toast.timeRemaining = 0;
+        }; */
+        return res;
+      })
+    );
+  }))
+  .catch(err => `BOOM ${err}`);
+
+};
