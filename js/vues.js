@@ -172,7 +172,7 @@ function renderQuizzes() {
   ul.className = "collection-item modal-trigger cyan lighten-5";
   let bouton=document.createElement('button');
   bouton.className="waves-effect waves-light btn black-text cyan lighten-4";
-  bouton.onclick=()=>NewQuiz();
+  bouton.onclick=()=>createquizz();
   bouton.innerHTML="Nouveau Quizz";
   ul.appendChild(bouton);
   let collection=document.getElementById('collection');
@@ -257,7 +257,7 @@ function createquizz()
   if(state.user)
   {
     console.debug(`@createquizz()`);
-    let main = document.getElementById('id-my-quizzes-main');
+    let main = document.getElementById('id-all-quizzes-main');
     let code="<h4>Nouveau Quizz<h4><br>";
 		code+="<label>Titre :<input placeholder='Titre de votre quiz' id='titre' type='text' class='validate'></label>";
     code+="<label>Description :<input placeholder='Description de votre quiz' id='description' type='text' class='validate'></label>";
@@ -346,7 +346,7 @@ function renderCurrentUserQuizz(quizz) {
 }
 
 function NewQuiz () {
-  const main = document.getElementById("");
+  const main = document.getElementById("id-all-quizzes-main");
   const code=`
     <h4>Modifier le quizz<h4><br>
     <form id="form_user>
@@ -405,17 +405,11 @@ function renderAnswQuizzes () {
 
 
 // quand on clique sur le bouton de login, il nous dit qui on est
-// eslint-disable-next-line no-unused-vars
 const renderUserBtn = () => {
   const btn = document.getElementById('id-login');
   btn.onclick = () => {
     if (state.user) {
-      // eslint-disable-next-line no-alert
-      /* alert(
-        `Bonjour ${state.user.firstname} ${state.user.lastname.toUpperCase()}` 
-      ); */
       getUser();
-      createquizz();
       document.getElementById('content-logout').innerHTML =
         `<h5> ${state.user.lastname.toUpperCase()} ${state.user.firstname} (${state.user.user_id}) <br />
         Vous êtes l'auteur de </h5>`;
