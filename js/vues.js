@@ -332,6 +332,7 @@ function renderCurrentUserQuizz(quizz) {
   }
   else {
     main.innerHTML = htmlQuizzesListContent(quizz);
+    
     const code=`
     <h4>Modifier le quizz<h4><br>;
     <form>
@@ -344,6 +345,10 @@ function renderCurrentUserQuizz(quizz) {
       <button class='waves-effect waves-light btn' id='create_quiz'>Modifier le quizz</button>
     </form>`;
     main.innerHTML=code;
+    const question=document.getElementById("question").value;
+    const reponse_un=document.getElementById("1").value;
+    const reponse_deux=document.getElementById("2").value;
+    
   }
 }
 
