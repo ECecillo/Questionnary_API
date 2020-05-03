@@ -40,7 +40,7 @@ const htmlQuizzesList = (quizzes, curr, total) => {
 
   // La liste complète et les deux boutons en bas
   const html = `
-  <ul class="collection">
+  <ul class="collection" id="collection">
     ${quizzesLIst.join('')}
   </ul>
   <div class="row">      
@@ -167,6 +167,15 @@ function renderQuizzes() {
     state.quizzes.currentPage,
     state.quizzes.nbPages
   );
+  let ul=document.createElement('ul');
+  ul.className = "collection-item modal-trigger cyan lighten-5";
+  let bouton=document.createElement('button');
+  bouton.className="waves-effect waves-light btn black-text cyan lighten-4";
+  bouton.onclick=()=>createquizz();
+  bouton.innerHTML="Nouveau Quizz";
+  ul.appendChild(bouton);
+  let collection=document.getElementById('collection');
+  collection.firstElementChild.before(ul);
 
   // /!\ il faut que l'affectation usersElt.innerHTML = ... ait eu lieu pour
   // /!\ que prevBtn, nextBtn et quizzes en soient pas null
@@ -242,33 +251,6 @@ function renderCurrentQuizz(data) {
   }
 }
 
-function createquizz()
-{
-  if(state.user)
-  {
-    console.debug(`@createquizz()`);
-    let main = document.getElementById('id-my-quizzes-main');
-    let code="<h4>Nouveau Quizz<h4><br>";
-		code+="<label>Titre :<input placeholder='Titre de votre quiz' id='titre' type='text' class='validate'></label>";
-    code+="<label>Description :<input placeholder='Description de votre quiz' id='description' type='text' class='validate'></label>";
-    //code+="<label>Question :<input placeholder='Question de votre quiz' id='question' type='text' class='validate'></label>";     Là il faudrait pouvoir choisir le nombre de questions du quizz
-		code+="<button class='waves-effect waves-light btn' id='create_quiz'>Créer le quiz</button>";
-    main.innerHTML=code;
-    document.getElementById("create_quiz").onclick=()=>{
-			let quiz={"title":document.getElementById('titre').value, "description":document.getElementById('description').value};
-			const url = `${state.serverUrl}/quizzes`;
-			console.log(quiz);
-			fetch(url, { method: 'POST', headers: state.headers(), body: JSON.stringify(quiz) })
-				.then(filterHttpResponse)
-				.then((data)=>{
-					// eslint-disable-next-line no-use-before-define
-					main.innerHTML=`Quiz numéro ${data.quiz_id} créé<br>Titre : ${quiz.title}<br>Description : ${quiz.description}`;
-				})
-				.catch(console.error);
-		}
-  }
-  
-}
 //Il faudrait attribuer à chaque question un id, puis demander le nombre de réponses par id de question, et ensuite attribuer un id
 //pour chaque réponses également
 
@@ -332,9 +314,8 @@ function renderCurrentUserQuizz(quizz) {
   }
   else {
     main.innerHTML = htmlQuizzesListContent(quizz);
-    
-    const code=`
-    <h4>Modifier le quizz<h4><br>;
+    /* const code=`
+    <h4>Modifier le quizz<h4><br>
     <form>
       <label>Question 
         <input placeholder='Votre question' name='question' type='text' class='validate' required>
@@ -347,11 +328,38 @@ function renderCurrentUserQuizz(quizz) {
     main.innerHTML=code;
     const question=document.getElementById("question").value;
     const reponse_un=document.getElementById("1").value;
-    const reponse_deux=document.getElementById("2").value;
+    const reponse_deux=document.getElementById("2").value; */
     
   }
 }
 
+function createquizz()
+{
+  if(state.user)
+  {
+    console.debug(`@createquizz()`);
+    let main = document.getElementById('id-all-quizzes-main');
+    let code="<h4>Nouveau Quizz<h4><br>";
+		code+="<label>Titre :<input placeholder='Titre de votre quiz' id='titre' type='text' class='validate'></label>";
+    code+="<label>Description :<input placeholder='Description de votre quiz' id='description' type='text' class='validate'></label>";
+    //code+="<label>Question :<input placeholder='Question de votre quiz' id='question' type='text' class='validate'></label>";     Là il faudrait pouvoir choisir le nombre de questions du quizz
+		code+="<button class='waves-effect waves-light btn' id='create_quiz'>Créer le quiz</button>";
+    main.innerHTML=code;
+    document.getElementById("create_quiz").onclick=()=>{
+			let quiz={"title":document.getElementById('titre').value, "description":document.getElementById('description').value};
+			const url = `${state.serverUrl}/quizzes`;
+			console.log(quiz);
+			fetch(url, { method: 'POST', headers: state.headers(), body: JSON.stringify(quiz) })
+				.then(filterHttpResponse)
+				.then((data)=>{
+					// eslint-disable-next-line no-use-before-define
+					main.innerHTML=`Quiz numéro ${data.quiz_id} créé<br>Titre : ${quiz.title}<br>Description : ${quiz.description}`;
+				})
+				.catch(console.error);
+		}
+  }
+  
+}
 
 function renderAnswQuizzes () {
   console.debug(`@renderAnswQuizzes()`);
@@ -382,12 +390,6 @@ function renderAnswQuizzes () {
     q.onclick = clickQuizz;
   });
 }
-
-
-
-
-
-
 
 // quand on clique sur le bouton de login, il nous dit qui on est
 // eslint-disable-next-line no-unused-vars
