@@ -55,8 +55,8 @@ const htmlQuizzesListContent = (quiz, answers) => {
   console.debug(`@htmlQuizzesListContent(${quiz})`);
 
   //Fonction qui va s'occuper de cocher les bonnes réponses pour l'affichage des réponses
- function checkAnsw (answer, proposition) {
-    if(answer !== undefined && answer.p === proposition.proposition_id) {
+  function checkAnsw(answer, proposition) {
+    if (answer !== undefined && answer.p === proposition.proposition_id) {
       return "checked";
     }
     else {
@@ -73,7 +73,7 @@ const htmlQuizzesListContent = (quiz, answers) => {
     prop.map((p) => {
       return `<label>
               <input type="radio" name="${id}" value="${p.proposition_id}" ${
-        disabled ? "disabled" : ""} ${checkAnsw(answer,prop)}>
+        disabled ? "disabled" : ""} ${checkAnsw(answer, prop)}>
               <span>${p.content}</span>
            </label>`;
     });
@@ -167,14 +167,14 @@ function renderQuizzes() {
     state.quizzes.currentPage,
     state.quizzes.nbPages
   );
-  let ul=document.createElement('ul');
+  let ul = document.createElement('ul');
   ul.className = "collection-item modal-trigger cyan lighten-5";
-  let bouton=document.createElement('button');
-  bouton.className="waves-effect waves-light btn black-text cyan lighten-4";
-  bouton.onclick=()=>createquizz();
-  bouton.innerHTML="Nouveau Quizz";
+  let bouton = document.createElement('button');
+  bouton.className = "waves-effect waves-light btn black-text cyan lighten-4";
+  bouton.onclick = () => createquizz();
+  bouton.innerHTML = "Nouveau Quizz";
   ul.appendChild(bouton);
-  let collection=document.getElementById('collection');
+  let collection = document.getElementById('collection');
   collection.firstElementChild.before(ul);
 
   // /!\ il faut que l'affectation usersElt.innerHTML = ... ait eu lieu pour
@@ -290,7 +290,8 @@ function renderUserQuizzes(quizz) {
     const quizzId = this.dataset.quizzid;
     return getQuizzData(quizzId).then((quizzData) => { //On récupère les infos du quizz
       const quizzInfo = quizz.find(e => e.quiz_id === Number(quizzId));
-      return renderCurrentUserQuizz({ info: quizzInfo, questions: quizzData })
+
+      return renderCurrentUserQuizz({ info: quizzInfo, questions: quizzData }, quizzId)
     });
   }
 
@@ -304,7 +305,7 @@ function renderUserQuizzes(quizz) {
 // Pour un quizz selectionné, on affiche les données du quizz en question
 // C'est à dire que l'on affiche le formulaire pour séléctionner les réponses des questions
 // ainsi que leurs questions. Mais cette fois pour les quizzes de l'utilisateur
-function renderCurrentUserQuizz(quizz) {
+function renderCurrentUserQuizz(quizz, id) {
   console.debug(`@renderCurrentQuizz()`);
   const main = document.getElementById('id-my-quizzes-main');
   console.debug(`@(${quizz.created_at})`);
@@ -314,82 +315,68 @@ function renderCurrentUserQuizz(quizz) {
   }
   else {
     main.innerHTML = htmlQuizzesListContent(quizz);
-    const modify = document.getElementById('id-modify-quizzes-main');
-    const code=`
+    return modifyQuizz(id);
+  }
+}
+function modifyQuizz(quizz) {
+  const modify = document.getElementById('id-modify-quizzes-main');
+  var idQ = 0;
+  const code = `
     <h4>Modifier le quizz<h4><br>
-    <form>
-      <label>Question 
-        <input placeholder='Votre question' name='question' type='text' class='validate' required>
-      </label>
-      <label>Réponses<input placeholder='Réponse 1' name='1' type='text' class='validate' required></br>
-        <input placeholder='Réponse 2' name='2' type='text' class='validate'>
-      </label>
-      <button class='waves-effect waves-light btn' id='create_quiz'>Modifier le quizz</button>
-    </form>`;
-    modify.innerHTML=code;
-    const question=document.getElementById("question").value;
-    const reponse_un=document.getElementById("1").value;
-    const reponse_deux=document.getElementById("2").value;
-    
+    <label>Nouvelle question :
+      <input placeholder='Votre question' id='question' type='text' class='validate'>
+    </label>
+    <label>
+      <input type='radio' name='newQ' checked='true'><span>Proposition ${idQ} :</span>
+      <input placeholder='Votre proposition' id='new_proposition${idQ}' type='text' class='validate'>
+      <input type='radio'>
+    </label>
+      <button class='waves-effect waves-light btn' id='create_answer'>Nouvelle proposition</button><br><br>
+      <button class='waves-effect waves-light btn' id='create_question'>Ajouter la question</button>
+        `;
+  
+  modify.innerHTML = code;
+  document.getElementById("create_answer").onclick = () => {
+    idQ++;
+    let html = `
+    <label>
+      <input type='radio' name='newQ'>
+      <span>Proposition ${idQ} :</span>
+      <input placeholder='Votre proposition' id='new_proposition${idQ}' type='text' class='validate'>
+    </label>`;
+    document.getElementById('new_proposition' + String(idQ - 1)).insertAdjacentHTML("afterend", html);
+  }
+  document.getElementById("create_question").onclick = () => {
+    const sentence = document.getElementById('question').value;
+    sendUserQuizz(quizz, idQ, sentence);
   }
 }
 
-function createquizz()
-{
-  if(state.user)
-  {
+
+function createquizz() {
+  if (state.user) {
     console.debug(`@createquizz()`);
     let main = document.getElementById('id-all-quizzes-main');
-    let code="<h4>Nouveau Quizz<h4><br>";
-		code+="<label>Titre :<input placeholder='Titre de votre quiz' id='titre' type='text' class='validate'></label>";
-    code+="<label>Description :<input placeholder='Description de votre quiz' id='description' type='text' class='validate'></label>";
+    let code = "<h4>Nouveau Quizz<h4><br>";
+    code += "<label>Titre :<input placeholder='Titre de votre quiz' id='titre' type='text' class='validate'></label>";
+    code += "<label>Description :<input placeholder='Description de votre quiz' id='description' type='text' class='validate'></label>";
     //code+="<label>Question :<input placeholder='Question de votre quiz' id='question' type='text' class='validate'></label>";     Là il faudrait pouvoir choisir le nombre de questions du quizz
-		code+="<button class='waves-effect waves-light btn' id='create_quiz'>Créer le quiz</button>";
-    main.innerHTML=code;
-    document.getElementById("create_quiz").onclick=()=>{
-			let quiz={"title":document.getElementById('titre').value, "description":document.getElementById('description').value};
-			const url = `${state.serverUrl}/quizzes`;
-			console.log(quiz);
-			fetch(url, { method: 'POST', headers: state.headers(), body: JSON.stringify(quiz) })
-				.then(filterHttpResponse)
-				.then((data)=>{
-					// eslint-disable-next-line no-use-before-define
-					main.innerHTML=`Quiz numéro ${data.quiz_id} créé<br>Titre : ${quiz.title}<br>Description : ${quiz.description}`;
-				})
-				.catch(console.error);
-		}
-  }
-  
-}
-
-function renderAnswQuizzes () {
-  console.debug(`@renderAnswQuizzes()`);
-
-  // les éléments à mettre à jour : le conteneur pour la liste des quizz de l'user
-  const usersElt = document.getElementById("id-my-answers-list");
-  const main = document.getElementById("id-my-answers-main");
-
-  if (quizz === undefined) {
-    usersElt.innerHTML = "<p style='color: crimson;'>Vous n'avez pas de quiz, veuillez vérifier votre connexion</p>";
-  } else {
-    usersElt.innerHTML = QuizzUtilisateur(quizz);
+    code += "<button class='waves-effect waves-light btn' id='create_quiz'>Créer le quiz</button>";
+    main.innerHTML = code;
+    document.getElementById("create_quiz").onclick = () => {
+      let quiz = { "title": document.getElementById('titre').value, "description": document.getElementById('description').value };
+      const url = `${state.serverUrl}/quizzes`;
+      console.log(quiz);
+      fetch(url, { method: 'POST', headers: state.headers(), body: JSON.stringify(quiz) })
+        .then(filterHttpResponse)
+        .then((data) => {
+          // eslint-disable-next-line no-use-before-define
+          main.innerHTML = `Quiz numéro ${data.quiz_id} créé<br>Titre : ${quiz.title}<br>Description : ${quiz.description}`;
+        })
+        .catch(console.error);
+    }
   }
 
-  main.innerHTML = "Pas de quiz séléctioné";
-
-  const quizzElt = document.querySelectorAll("#id-my-quizzes-list li");
-
-  function clickQuizz() {
-    const quizzId = this.dataset.quizzid;
-    return getQuizzData(quizzId).then((quizzData) => { //On récupère les infos du quizz
-      const quizzInfo = quizz.find(e => e.quiz_id === Number(quizzId));
-      return AnswQuizz(quizzData, quizzAnsw)
-    });
-  }
-
-  quizzElt.forEach((q) => {
-    q.onclick = clickQuizz;
-  });
 }
 
 // quand on clique sur le bouton de login, il nous dit qui on est
@@ -407,7 +394,7 @@ const renderUserBtn = () => {
       document.getElementById('content-logout').innerHTML =
         `<h5> ${state.user.lastname.toUpperCase()} ${state.user.firstname} (${state.user.user_id}) <br />
         Vous êtes l'auteur de </h5>`;
-      document.getElementById('id-logout').onclick = function() {
+      document.getElementById('id-logout').onclick = function () {
         state.xApiKey = '';
         getUser();
         document.location.reload(true);

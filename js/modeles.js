@@ -195,38 +195,45 @@ const sendQuizz = (Sform) => { // form
       })
     );
   }))
-  .catch(err => `BOOM ${err}`);
+    .catch(err => `BOOM ${err}`);
 
 };
 
 
-const sendUserQuizz = (Sform) => { // form
-  const form = new FormData(Sform);
-  const quiz_id = document.getElementById("form_user").dataset.id;
-
-  console.debug(`@SendQuiz(${form})`);
-
-  const A = Array.from(form);
-
-  Promise.all(A.map((pa) => {
-    const url = `${state.serverUrl}/quizzes/${quiz_id}/questions/${pa[0]}/answers/${pa[1]}`;
-
-    return (fetch(url, { method: "POST", headers: state.headers() })
-      .then(filterHttpResponse)
-      .then((res) => {
-        const date = new Date(res.answered_at).toLocaleString();
-        const toast = M.toast({
-          html: `La question ${res.question_id} du quiz d'identifiant ${res.quiz_id} à été validé à ${date}`,
-          classes: "toast-update",
-          displayLength: 5000,
-        }).el;
-        toast.el.onclick = function dismiss() {
-          toast.timeRemaining = 0;
-        };
-        return res;
-      })
-    );
-  }))
-  .catch(err => `BOOM ${err}`);
+const sendUserQuizz = (id, idQ, sentence) => {
+  console.debug(`@SendUserQuiz(${id})`);
+  const url = `${state.serverUrl}/quizzes/${id}/questions/`;
+  const questionObj = {
+    "question_id": id,
+    "sentence": sentence,
+    "propositions": []
+  };
+  for (let j = 0; j <= idQ; j++) {
+    let prop = document.getElementById("new_proposition" + String(j));
+    if (prop.previousElementSibling.previousElementSibling.checked == true)
+      questionObj.propositions.push({
+        "content": prop.value,
+        "proposition_id": j,
+        "correct": "false"
+      });
+    else
+      questionObj.propositions.push({
+        "content": prop.value,
+        "proposition_id": j,
+        "correct": "true"
+      });
+  }
+  return (fetch(url, { method: 'POST', headers: state.headers(), body: JSON.stringify(questionObj)})
+    .then(filterHttpResponse)
+    .then(() => {
+      var toast = M.toast({
+        html: 'Le quiz a été ajouté avec succès !',
+        displayLength: 5000,
+      });
+      toast.el.onclick = function dismiss() {
+        toast.timeRemaining = 0;
+      };
+    })
+    .catch(console.error));
 
 };
