@@ -333,6 +333,37 @@ function renderAnswQuizzes () {
   });
 }
 
+function createquizz()
+{
+  if(state.user)
+  {
+    console.debug(`@createquizz()`);
+    let main = document.getElementById('id-my-quizzes-main');
+    let code="<h4>Nouveau Quizz<h4><br>";
+		code+="<label>Titre :<input placeholder='Titre de votre quiz' id='titre' type='text' class='validate'></label>";
+    code+="<label>Description :<input placeholder='Description de votre quiz' id='description' type='text' class='validate'></label>";
+    code+="<label>Question :<input placeholder='Question de votre quiz' id='question' type='text' class='validate'></label>";
+		code+="<button class='waves-effect waves-light btn' id='create_quiz'>Créer le quiz</button>";
+    main.innerHTML=code;
+    document.getElementById("create_quiz").onclick=()=>{
+			let quiz={"title":document.getElementById('titre').value, "description":document.getElementById('description').value};
+			const url = `${state.serverUrl}/quizzes`;
+			console.log(quiz);
+			fetch(url, { method: 'POST', headers: state.headers(), body: JSON.stringify(quiz) })
+				.then(filterHttpResponse)
+				.then((data)=>{
+					// eslint-disable-next-line no-use-before-define
+					main.innerHTML=`Quiz numéro ${data.quiz_id} créé<br>Titre : ${quiz.title}<br>Description : ${quiz.description}`;
+				})
+				.catch(console.error);
+		}
+  }
+  
+}
+
+
+
+
 // quand on clique sur le bouton de login, il nous dit qui on est
 // eslint-disable-next-line no-unused-vars
 const renderUserBtn = () => {
@@ -344,6 +375,7 @@ const renderUserBtn = () => {
         `Bonjour ${state.user.firstname} ${state.user.lastname.toUpperCase()}` 
       ); */
       getUser();
+      createquizz();
       document.getElementById('content-logout').innerHTML =
         `<h5> ${state.user.lastname.toUpperCase()} ${state.user.firstname} (${state.user.user_id}) <br />
         Vous êtes l'auteur de </h5>`;
