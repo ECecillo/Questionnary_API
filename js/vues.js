@@ -332,34 +332,12 @@ function renderCurrentUserQuizz(quizz) {
   }
   else {
     main.innerHTML = htmlQuizzesListContent(quizz);
-    /*var idQ=0;
-		code+="<br><label>Nouvelle question :<input placeholder='Votre question' id='question' type='text' class='validate'></label>";
-		code+="<label><input type='radio' name='newQ' checked='true'><span>Proposition "+idQ+" :</span><input placeholder='Votre proposition' id='new_proposition"+idQ+"' type='text' class='validate'><input type='radio'></label>";
-		code+="<button class='waves-effect waves-light btn' id='create_answer'>Nouvelle proposition</button><br><br>";
-		code+="<button class='waves-effect waves-light btn' id='create_question'>Ajouter la question</button>";
-    document.getElementById("create_answer").onclick=()=>{
-      idQ++;
-      code="<label><input type='radio' name='newQ'><span>Proposition "+idQ+" :</span><input placeholder='Votre proposition' id='new_proposition"+idQ+"' type='text' class='validate'></label>";
-      document.getElementById('new_proposition'+String(idQ-1)).insertAdjacentHTML("afterend",code);
-    }
-    document.getElementById("create_question").onclick=()=>{
-      let question={"question_id":id, "sentence":document.getElementById("question").value, "propositions":[]};
-      for (let j=0; j<=idQ; j++)
-      {
-        let prop=document.getElementById("new_proposition"+String(j));
-        if (prop.previousElementSibling.previousElementSibling.checked==true)
-          question.propositions.push({"content":prop.value, "proposition_id":j, "correct":"false"});
-        else
-          question.propositions.push({"content":prop.value, "proposition_id":j, "correct":"true"});
-        console.log(j);
-      }
-      let url2 = `${state.serverUrl}/quizzes/${state.currentQuizz}/questions/`;
-      fetch(url2, { method: 'POST', headers: state.headers(), body: JSON.stringify(question) })
-        .then(filterHttpResponse)
-        .then((data)=>{console.log(question);console.log(data);})
-        .catch(console.error);
-      //renderCurrentUserQuizz(1);
-    }*/
+    let code="<h4>Modifier le quizz<h4><br>";
+		code+="<form><label>Question <input placeholder='Votre question' name='question' type='text' class='validate' required></label>";
+    code+="<label>Réponses<input placeholder='Réponse 1' name='1' type='text' class='validate' required></br><input placeholder='Réponse 2' name='2' type='text' class='validate'></label></form>";
+    //code+="<label>Question :<input placeholder='Question de votre quiz' id='question' type='text' class='validate'></label>";     Là il faudrait pouvoir choisir le nombre de questions du quizz
+		code+="<button class='waves-effect waves-light btn' id='create_quiz'>Modifier le quizz</button>";
+    main.innerHTML=code;
   }
 }
 
