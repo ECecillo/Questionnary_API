@@ -218,13 +218,18 @@ function renderQuizzes() {
   });
 }
 
+// pour un quizz selectionné, on affiche les données du quizz en question
+// C'est à dire que l'on affiche le formulaire pour séléctionner les réponses des questions
+// ainsi que leurs questions
 function renderCurrentQuizz(data) {
   console.debug(`@renderCurrentQuizz()`);
   const main = document.getElementById('id-all-quizzes-main');
   console.debug(`@(${data.created_at})`);
+  // On gère si il y a bien des données à afficher
   if (data === undefined) {
     main.innerHTML = "Pas de data";
   }
+  // On les affiche si elles existent
   else {
     main.innerHTML = htmlQuizzesListContent(data);
     document.querySelector(
@@ -237,6 +242,7 @@ function renderCurrentQuizz(data) {
   }
 }
 
+// On affiche la liste des quizzes disponibles de l'utilisateur actuellement connecté
 const QuizzUtilisateur = (quizzes) => {
   console.debug("@htmlUserQuizzes()");
 
@@ -245,7 +251,8 @@ const QuizzUtilisateur = (quizzes) => {
   return quizzesList;
 };
 
-
+// On gère l'affichage des quizzes sélectionnés mais ainsi que
+// l'affichage de la liste des quizzes de l'utilisateur connecté
 function renderUserQuizzes(quizz) {
   console.debug(`@renderUserQuizzes()`);
 
@@ -253,16 +260,19 @@ function renderUserQuizzes(quizz) {
   const usersElt = document.getElementById("id-my-quizzes-list");
   const main = document.getElementById("id-my-quizzes-main");
 
+  //On gère si l'utilisateur possède un/des quizz/es
   if (quizz === undefined) {
     usersElt.innerHTML = "Vous n'avez pas de quiz, veuillez vérifier votre connexion";
   } else {
     usersElt.innerHTML = QuizzUtilisateur(quizz);
   }
 
+  //Si aucun quizz n'est séléctionné
   main.innerHTML = "Pas de quiz séléctioné";
 
   const quizzElt = document.querySelectorAll("#id-my-quizzes-list li");
 
+  //On gère l'événement lorsque l'utilisateur cliques sur l'un des quizzes disponibles
   function clickQuizz() {
     const quizzId = this.dataset.quizzid;
     return getQuizzData(quizzId).then((quizzData) => { //On récupère les infos du quizz
@@ -276,10 +286,14 @@ function renderUserQuizzes(quizz) {
   });
 }
 
+// Pour un quizz selectionné, on affiche les données du quizz en question
+// C'est à dire que l'on affiche le formulaire pour séléctionner les réponses des questions
+// ainsi que leurs questions. Mais cette fois pour les quizzes de l'utilisateur
 function renderCurrentUserQuizz(quizz) {
   console.debug(`@renderCurrentQuizz()`);
   const main = document.getElementById('id-my-quizzes-main');
   console.debug(`@(${quizz.created_at})`);
+  // On gère si il y a bien des données à afficher
   if (quizz === undefined) {
     main.innerHTML = "Pas de data";
   }
