@@ -40,7 +40,7 @@ const htmlQuizzesList = (quizzes, curr, total) => {
 
   // La liste complète et les deux boutons en bas
   const html = `
-  <ul class="collection">
+  <ul class="collection" id="collection">
     ${quizzesLIst.join('')}
   </ul>
   <div class="row">      
