@@ -242,6 +242,37 @@ function renderCurrentQuizz(data) {
   }
 }
 
+function createquizz()
+{
+  if(state.user)
+  {
+    console.debug(`@createquizz()`);
+    let main = document.getElementById('id-my-quizzes-main');
+    let code="<h4>Nouveau Quizz<h4><br>";
+		code+="<label>Titre :<input placeholder='Titre de votre quiz' id='titre' type='text' class='validate'></label>";
+    code+="<label>Description :<input placeholder='Description de votre quiz' id='description' type='text' class='validate'></label>";
+    //code+="<label>Question :<input placeholder='Question de votre quiz' id='question' type='text' class='validate'></label>";     Là il faudrait pouvoir choisir le nombre de questions du quizz
+		code+="<button class='waves-effect waves-light btn' id='create_quiz'>Créer le quiz</button>";
+    main.innerHTML=code;
+    document.getElementById("create_quiz").onclick=()=>{
+			let quiz={"title":document.getElementById('titre').value, "description":document.getElementById('description').value};
+			const url = `${state.serverUrl}/quizzes`;
+			console.log(quiz);
+			fetch(url, { method: 'POST', headers: state.headers(), body: JSON.stringify(quiz) })
+				.then(filterHttpResponse)
+				.then((data)=>{
+					// eslint-disable-next-line no-use-before-define
+					main.innerHTML=`Quiz numéro ${data.quiz_id} créé<br>Titre : ${quiz.title}<br>Description : ${quiz.description}`;
+				})
+				.catch(console.error);
+		}
+  }
+  
+}
+//Il faudrait attribuer à chaque question un id, puis demander le nombre de réponses par id de question, et ensuite attribuer un id
+//pour chaque réponses également
+
+
 // On affiche la liste des quizzes disponibles de l'utilisateur actuellement connecté
 const QuizzUtilisateur = (quizzes) => {
   console.debug("@htmlUserQuizzes()");
@@ -281,6 +312,8 @@ function renderUserQuizzes(quizz) {
     });
   }
 
+
+
   quizzElt.forEach((q) => {
     q.onclick = clickQuizz;
   });
@@ -299,6 +332,34 @@ function renderCurrentUserQuizz(quizz) {
   }
   else {
     main.innerHTML = htmlQuizzesListContent(quizz);
+    /*var idQ=0;
+		code+="<br><label>Nouvelle question :<input placeholder='Votre question' id='question' type='text' class='validate'></label>";
+		code+="<label><input type='radio' name='newQ' checked='true'><span>Proposition "+idQ+" :</span><input placeholder='Votre proposition' id='new_proposition"+idQ+"' type='text' class='validate'><input type='radio'></label>";
+		code+="<button class='waves-effect waves-light btn' id='create_answer'>Nouvelle proposition</button><br><br>";
+		code+="<button class='waves-effect waves-light btn' id='create_question'>Ajouter la question</button>";
+    document.getElementById("create_answer").onclick=()=>{
+      idQ++;
+      code="<label><input type='radio' name='newQ'><span>Proposition "+idQ+" :</span><input placeholder='Votre proposition' id='new_proposition"+idQ+"' type='text' class='validate'></label>";
+      document.getElementById('new_proposition'+String(idQ-1)).insertAdjacentHTML("afterend",code);
+    }
+    document.getElementById("create_question").onclick=()=>{
+      let question={"question_id":id, "sentence":document.getElementById("question").value, "propositions":[]};
+      for (let j=0; j<=idQ; j++)
+      {
+        let prop=document.getElementById("new_proposition"+String(j));
+        if (prop.previousElementSibling.previousElementSibling.checked==true)
+          question.propositions.push({"content":prop.value, "proposition_id":j, "correct":"false"});
+        else
+          question.propositions.push({"content":prop.value, "proposition_id":j, "correct":"true"});
+        console.log(j);
+      }
+      let url2 = `${state.serverUrl}/quizzes/${state.currentQuizz}/questions/`;
+      fetch(url2, { method: 'POST', headers: state.headers(), body: JSON.stringify(question) })
+        .then(filterHttpResponse)
+        .then((data)=>{console.log(question);console.log(data);})
+        .catch(console.error);
+      //renderCurrentUserQuizz(1);
+    }*/
   }
 }
 
@@ -333,33 +394,8 @@ function renderAnswQuizzes () {
   });
 }
 
-function createquizz()
-{
-  if(state.user)
-  {
-    console.debug(`@createquizz()`);
-    let main = document.getElementById('id-my-quizzes-main');
-    let code="<h4>Nouveau Quizz<h4><br>";
-		code+="<label>Titre :<input placeholder='Titre de votre quiz' id='titre' type='text' class='validate'></label>";
-    code+="<label>Description :<input placeholder='Description de votre quiz' id='description' type='text' class='validate'></label>";
-    code+="<label>Question :<input placeholder='Question de votre quiz' id='question' type='text' class='validate'></label>";
-		code+="<button class='waves-effect waves-light btn' id='create_quiz'>Créer le quiz</button>";
-    main.innerHTML=code;
-    document.getElementById("create_quiz").onclick=()=>{
-			let quiz={"title":document.getElementById('titre').value, "description":document.getElementById('description').value};
-			const url = `${state.serverUrl}/quizzes`;
-			console.log(quiz);
-			fetch(url, { method: 'POST', headers: state.headers(), body: JSON.stringify(quiz) })
-				.then(filterHttpResponse)
-				.then((data)=>{
-					// eslint-disable-next-line no-use-before-define
-					main.innerHTML=`Quiz numéro ${data.quiz_id} créé<br>Titre : ${quiz.title}<br>Description : ${quiz.description}`;
-				})
-				.catch(console.error);
-		}
-  }
-  
-}
+
+
 
 
 
