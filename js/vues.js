@@ -314,7 +314,8 @@ function renderCurrentUserQuizz(quizz) {
   }
   else {
     main.innerHTML = htmlQuizzesListContent(quizz);
-    /* const code=`
+    const modify = document.getElementById('id-modify-quizzes-main');
+    const code=`
     <h4>Modifier le quizz<h4><br>
     <form>
       <label>Question 
@@ -325,10 +326,10 @@ function renderCurrentUserQuizz(quizz) {
       </label>
       <button class='waves-effect waves-light btn' id='create_quiz'>Modifier le quizz</button>
     </form>`;
-    main.innerHTML=code;
+    modify.innerHTML=code;
     const question=document.getElementById("question").value;
     const reponse_un=document.getElementById("1").value;
-    const reponse_deux=document.getElementById("2").value; */
+    const reponse_deux=document.getElementById("2").value;
     
   }
 }
