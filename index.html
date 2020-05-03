@@ -87,6 +87,9 @@
           <div class="col l4">
             <div id="id-my-quizzes-main"></div>
           </div>
+          <div class="col l4">
+            <div id="id-his-quizzes-main"></div>
+          </div>
         </div>
       </div>
       <!-- Un dernier onglet pour ses propres réponses-->
@@ -105,10 +108,15 @@
 
   <!-- Modal Structure for the login -->
   <div id="modal1" class="modal">
-    <header class="head"><blockquote> <h4>Bienvenue</h4> </blockquote></header>
+    <header class="head">
+      <blockquote>
+        <h4>Bienvenue</h4>
+      </blockquote>
+    </header>
     <div class="modal-content">
       <label for="key"><strong>Entrer votre clé</strong></label>
-      <input type="text" id="api" name="name" class="key-input" placeholder="7038e76c-7fc3-423f-bfaa-97a0872bdb68" required>
+      <input type="text" id="api" name="name" class="key-input" placeholder="7038e76c-7fc3-423f-bfaa-97a0872bdb68"
+        required>
     </div>
     <div class="modal-footer">
       <button class="modal-close btn waves-effect waves-light" type="button">Close
@@ -122,7 +130,11 @@
   </div>
   <!-- Modal Structure to logout -->
   <div id="modal2" class="modal">
-    <header class="head"><blockquote> <h4>Bienvenue</h4> </blockquote></header>
+    <header class="head">
+      <blockquote>
+        <h4>Bienvenue</h4>
+      </blockquote>
+    </header>
     <div class="modal-content" id="content-logout"></div>
     <div class="modal-footer">
       <button class="modal-close btn waves-effect waves-light" type="button">OK
@@ -133,6 +145,18 @@
       </button>
       <div id="confirm-message"></div>
     </div>
+  </div>
+
+  <div class="fixed-action-btn">
+    <a class="btn-floating btn-large red">
+      <i class="large material-icons">mode_edit</i>
+    </a>
+    <ul>
+      <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
+      <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li>
+      <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+      <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
+    </ul>
   </div>
 
 

@@ -167,7 +167,17 @@ function renderQuizzes() {
     state.quizzes.currentPage,
     state.quizzes.nbPages
   );
-
+  
+  let ul=document.createElement('ul');
+  ul.className = "collection-item modal-trigger cyan lighten-5";
+  let bouton=document.createElement('button');
+  bouton.className="waves-effect waves-light btn black-text cyan lighten-4";
+  bouton.onclick=()=>createNewQuiz();
+  bouton.innerHTML="Nouveau Quizz";
+  ul.appendChild(bouton);
+  let collection=document.getElementById('collection');
+  collection.firstElementChild.before(ul);
+  
   // /!\ il faut que l'affectation usersElt.innerHTML = ... ait eu lieu pour
   // /!\ que prevBtn, nextBtn et quizzes en soient pas null
   // les éléments à mettre à jour : les boutons
@@ -324,7 +334,7 @@ function renderUserQuizzes(quizz) {
 // ainsi que leurs questions. Mais cette fois pour les quizzes de l'utilisateur
 function renderCurrentUserQuizz(quizz) {
   console.debug(`@renderCurrentQuizz()`);
-  const main = document.getElementById('id-my-quizzes-main');
+  const main = document.getElementById('id-his-quizzes-main');
   console.debug(`@(${quizz.created_at})`);
   // On gère si il y a bien des données à afficher
   if (quizz === undefined) {
@@ -334,8 +344,8 @@ function renderCurrentUserQuizz(quizz) {
     main.innerHTML = htmlQuizzesListContent(quizz);
     
     const code=`
-    <h4>Modifier le quizz<h4><br>;
-    <form>
+    <h4>Modifier le quizz<h4><br>
+    <form id="form_user>
       <label>Question 
         <input placeholder='Votre question' name='question' type='text' class='validate' required>
       </label>
@@ -345,9 +355,13 @@ function renderCurrentUserQuizz(quizz) {
       <button class='waves-effect waves-light btn' id='create_quiz'>Modifier le quizz</button>
     </form>`;
     main.innerHTML=code;
-    const question=document.getElementById("question").value;
-    const reponse_un=document.getElementById("1").value;
-    const reponse_deux=document.getElementById("2").value;
+    document.querySelector(
+      "#id-his-quizzes-main #form_user"
+    ).onsubmit = function submitForm(ev) {
+      ev.preventDefault();
+      const form = document.getElementById("form_user");
+      sendQuizz(form);
+    };
     
   }
 }

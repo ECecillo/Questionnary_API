@@ -198,3 +198,35 @@ const sendQuizz = (Sform) => { // form
   .catch(err => `BOOM ${err}`);
 
 };
+
+
+const sendUserQuizz = (Sform) => { // form
+  const form = new FormData(Sform);
+  const quiz_id = document.getElementById("form_user").dataset.id;
+
+  console.debug(`@SendQuiz(${form})`);
+
+  const A = Array.from(form);
+
+  Promise.all(A.map((pa) => {
+    const url = `${state.serverUrl}/quizzes/${quiz_id}/questions/${pa[0]}/answers/${pa[1]}`;
+
+    return (fetch(url, { method: "POST", headers: state.headers() })
+      .then(filterHttpResponse)
+      .then((res) => {
+        const date = new Date(res.answered_at).toLocaleString();
+        const toast = M.toast({
+          html: `La question ${res.question_id} du quiz d'identifiant ${res.quiz_id} à été validé à ${date}`,
+          classes: "toast-update",
+          displayLength: 5000,
+        }).el;
+        toast.el.onclick = function dismiss() {
+          toast.timeRemaining = 0;
+        };
+        return res;
+      })
+    );
+  }))
+  .catch(err => `BOOM ${err}`);
+
+};
