@@ -417,3 +417,13 @@ const renderUserBtn = () => {
     }
   };
 };
+
+function reserch(c){
+  console.debug(`@reserch()`);
+  let main = document.getElementById('id-all-quizzes-main');
+  quizz.forEach((q) = {
+    if (q=c) {
+      
+    }
+  });
+}
