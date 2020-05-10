@@ -422,7 +422,7 @@ const renderUserBtn = () => {
 $(document).ready(function () {
   $("#search").on("keyup", function () {
     var value = $(this).val().toLowerCase();
-    document.getElementById('id-all-quizzes-main').filter(function () {
+    $("#id-all-quizzes").filter(function () {
       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
     });
   });
