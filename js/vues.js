@@ -418,12 +418,26 @@ const renderUserBtn = () => {
   };
 };
 
-function reserch(c){
+
+$(document).ready(function () {
+  $("#search").on("keyup", function () {
+    var value = $(this).val().toLowerCase();
+    document.getElementById('id-all-quizzes-main').filter(function () {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+    });
+  });
+});
+
+/*function reserch(c){
   console.debug(`@reserch()`);
   let main = document.getElementById('id-all-quizzes-main');
+  c = $("search");
+  var value = $(this).val().toLowerCase();
   quizz.forEach((q) = {
     if (q=c) {
       
     }
   });
 }
+
+*/
