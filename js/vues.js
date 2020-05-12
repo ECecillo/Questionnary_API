@@ -387,26 +387,11 @@ function renderCurrentUserQuizz(quizz, id) {
     });
 
     changeTD.addEventListener("click", function () {
-      return changeTitleDesc(quiz,id);
+      return changeTitleDesc(quizz,id);
     });
   }
 }
 
-// Fonction qui change le titre et la description d'un quiz
-function changeTitleDesc(quizz, id) {
-  console.debug("changeTitleDesc()");
-  const modify = document.getElementById("id-modify-quizzes-main");
-  const code = `
-  <h4>Modifier le Titre et la Description<h4>
-  <label>Titre :
-      <input placeholder='Votre question' id='question' type='text' class='validate' value='${quizz.info.title}'>
-    </label>
-    <label>Description :
-      <input placeholder='Votre question' id='question' type='text' class='validate' value='${quizz.info.description}'>
-    </label>`;
-
-  modify.innerHTML = code;
-}
 
 // Fonction qui ajoute une nouvelle proposition à un quiz
 function addNewProp(quizz_id, nbQ) {
@@ -466,9 +451,33 @@ function createquizz() {
     document.getElementById("create_quiz").onclick = () => {
       let title = document.getElementById("titre").value;
       let description = document.getElementById("description").value;
-      sendNewQuizz(title, description);
+      sendNewQuizz(title, description, "POST");
     };
   }
+}
+
+// Fonction qui change le titre et la description d'un quiz
+function changeTitleDesc(quizz, quizz_id) {
+  console.debug("changeTitleDesc()");
+  const modify = document.getElementById("id-modify-quizzes-main");
+  const code = `
+  <h4>Modifier le Titre et la Description<h4>
+  <label>Titre :
+      <input placeholder='Le Nouveau titre' id='new_title' type='text' class='validate' value='${quizz.info.title}'>
+    </label>
+    <label>Description :
+      <input placeholder='La nouvelle description' id='new_desc' type='text' class='validate' value='${quizz.info.description}'>
+    </label>
+    <button class='waves-effect waves-light btn' id='update_quiz'>Modifier le Quiz</button>
+    `;
+
+  modify.innerHTML = code;
+
+  document.getElementById("update_quiz").onclick = () => {
+    let title = document.getElementById("new_title").value;
+    let description = document.getElementById("new_desc").value;
+    sendNewQuizz(title, description, "PUT", quizz_id);
+  };
 }
 // quand on clique sur le bouton de login, il nous dit qui on est
 // eslint-disable-next-line no-unused-vars
