@@ -372,7 +372,7 @@ function renderCurrentUserQuizz(quizz, id) {
     }
 
     const changeTD = document.querySelector(".changeTD"); // Affichera changeTitleDesc
-    const CreateProp = document.querySelector(".create"); // Affichera modifyQuizz
+    const CreateProp = document.querySelector(".create"); // Affichera addNewProp
 
     CreateProp.addEventListener("click", function () {
       // On appuie sur le bouton PLUS
@@ -383,16 +383,17 @@ function renderCurrentUserQuizz(quizz, id) {
         }
         return idQ;
       }
-      return modifyQuizz(id, sentence());
+      return addNewProp(id, sentence());
     });
 
     changeTD.addEventListener("click", function () {
-      return changeTitleDesc(id);
+      return changeTitleDesc(quiz,id);
     });
   }
 }
 
-function changeTitleDesc(id) {
+// Fonction qui change le titre et la description d'un quiz
+function changeTitleDesc(quizz, id) {
   console.debug("changeTitleDesc()");
   const modify = document.getElementById("id-modify-quizzes-main");
   const code = `
@@ -407,8 +408,9 @@ function changeTitleDesc(id) {
   modify.innerHTML = code;
 }
 
-function modifyQuizz(quizz_id, nbQ) {
-  console.debug(`modifyQuizz(${quizz_id})`);
+// Fonction qui ajoute une nouvelle proposition à un quiz
+function addNewProp(quizz_id, nbQ) {
+  console.debug(`addNewProp(${quizz_id})`);
   const modify = document.getElementById("id-modify-quizzes-main");
   var idQ = nbQ;
   var idP = 0;
