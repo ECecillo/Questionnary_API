@@ -127,9 +127,11 @@ function getQuizzInfo(id) {
   console.debug(`@getQuizzInfo(${id})`);
   const url = `${state.serverUrl}/quizzes/${id}`;
 
-  return fetch(url, { method: "GET", headers: state.headers() }).then(
-    filterHttpResponse
-  );
+  return fetch(url, { method: "GET", headers: state.headers() })
+    .then(filterHttpResponse)
+    .then((data) => {
+      state.currentQuizz = data;
+    });
 }
 
 // /!\ On récupère les données du quiz grâce à l'id (propositions, questions ...) /!\
@@ -139,7 +141,7 @@ function getQuizzData(id) {
   const url = `${state.serverUrl}/quizzes/${id}/questions`;
 
   return fetch(url, { method: "GET", headers: state.headers() })
-    .then(filterHttpResponse);
+    .then(filterHttpResponse)
 }
 
 // /!\ Va chercher toutes les infos d'un quizz avec son id, on a ces réponses ect ... /!\
@@ -199,16 +201,46 @@ const sendQuizz = (Sform) => { // form
 
 };
 
+// On envoie le quiz créer par l'utilisateur.
+//titre: variable qui contient le titre du quiz que l'on récup avec value.
+// desc: variable qui contient la description du quiz  que l'on récup avec value.
+const sendNewQuizz = (titre, desc) => {
+  const url = `${state.serverUrl}/quizzes`;
+  const quiz = {
+      title: titre,
+      description: desc,
+    };
 
-const sendUserQuizz = (id, idQ, sentence) => {
-  console.debug(`@SendUserQuiz(${id})`);
+    fetch(url, { method: "POST", headers: state.headers(), body: JSON.stringify(quiz), })
+      .then(filterHttpResponse)
+      .then(() => {
+       // const date = new Date(data.answered_at).toLocaleString();
+        const toast = M.toast({
+          html:
+            `Quiz numéro ${quiz.quiz_id} crée. <br>
+            Titre : ${quiz.title}.
+            <br>Description : ${quiz.description}.`,
+          classes: "toast-update",
+          displayLength: 5000,
+        });
+      })
+      .catch(console.error);
+}
+
+
+// Créer des nouvelles questions et proposition.
+// id: id du quiz où l'on ajoutera les nouvelles prop.
+// idP: le nombre de proposition.
+// sentence: la question qui sera rattaché au proposition.
+const sendUserProp = (id, idQ, idP, sentence) => {
+  console.debug(`@SendUserProp(${id})`);
   const url = `${state.serverUrl}/quizzes/${id}/questions/`;
   const questionObj = {
-    "question_id": id,
+    "question_id": idQ,
     "sentence": sentence,
     "propositions": []
   };
-  for (let j = 0; j <= idQ; j++) {
+  for (let j = 0; j <= idP; j++) {
     let prop = document.getElementById("new_proposition" + String(j));
     if (prop.previousElementSibling.previousElementSibling.checked == true)
       questionObj.propositions.push({
@@ -223,11 +255,11 @@ const sendUserQuizz = (id, idQ, sentence) => {
         "correct": "true"
       });
   }
-  return (fetch(url, { method: 'POST', headers: state.headers(), body: JSON.stringify(questionObj)})
+  return (fetch(url, { method: 'POST', headers: state.headers(), body: JSON.stringify(questionObj) })
     .then(filterHttpResponse)
     .then(() => {
       var toast = M.toast({
-        html: 'Le quiz a été ajouté avec succès !',
+        html: 'Une nouvelle proposition a été ajouté !',
         displayLength: 5000,
       });
       toast.el.onclick = function dismiss() {
