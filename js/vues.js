@@ -85,7 +85,19 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
   const Question = (questions, answers, disabled) =>
     questions.map(
       (q) =>
-        `<h6 id="sentence_${q.question_id}">${q.sentence}</h6>
+        `<h6 id="sentence_${q.question_id}">${q.sentence}
+        ${
+          userQuiz === true
+            ? `
+          <a class="btn-floating orange edit_prop"> 
+            <i class="material-icons">create</i>
+          </a>
+          <a id="${q.question_id}" class="btn-floating red delete_forever"> 
+            <i class="material-icons">delete_forever</i>
+          </a>`
+            : ""
+        }
+        </h6>
         ${Propositions(
           q.propositions,
           q.question_id,
@@ -111,16 +123,6 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
     return RenderSubButt(noSubmit, noDisabled, btnDisplay);
   }
 
-  //Créer un toast quand on cliquera sur le bouton submit.
-  /* const date_sub = parseDate(new Date(quiz.answered_at));
-  const toast = M.toast({
-    html: `La question ${quiz.question_id} du quiz d'identifiant ${quiz.quiz_id} à été validé à ${date_sub}`,
-    classes: "toast-update",
-    displayLength: 5000,
-  }).el;
-  toast.onclick = function dismiss() {
-    toast.timeRemaining = 0;
-  }; */
   // /!\ Vérifie si le bouton valider a été soumis par l'user /!\
   function RenderSubButt(noSub, noDisab, idBtn) {
     if (noSub) {
@@ -328,6 +330,10 @@ function renderUserQuizzes(quizz) {
 }
 
 // Créer des floating action button
+// color: la couleur de l'icone
+// nameOfIcon: le nom de l'icone pour l'affichage par rapport à material icon
+// className: pour la génération d'eventlistener
+// divToAppend: si on veut le mettre à un endroit précis.
 function renderSmallFloatingObject(color, nameOfIcon, className, divToAppend) {
   let a = document.createElement("a");
   a.className = `btn-floating ${color} ${className}`;
@@ -337,14 +343,14 @@ function renderSmallFloatingObject(color, nameOfIcon, className, divToAppend) {
 // Pour un quizz selectionné, on affiche les données du quizz en question
 // C'est à dire que l'on affiche le formulaire pour séléctionner les réponses des questions
 // ainsi que leurs questions. Mais cette fois pour les quizzes de l'utilisateur
-function renderCurrentUserQuizz(quizz, id) {
-  console.debug(`@renderCurrentUserQuizz(${quizz}, ${id})`);
+function renderCurrentUserQuizz(quizz, quiz_id) {
+  console.debug(`@renderCurrentUserQuizz(${quizz}, ${quiz_id})`);
   const main = document.getElementById("id-my-quizzes-main");
   // On gère si il y a bien des données à afficher
   if (quizz === undefined) {
     main.innerHTML = "Pas de data";
   } else {
-    main.innerHTML = htmlQuizzesListContent(quizz);
+    main.innerHTML = htmlQuizzesListContent(quizz, true);
 
     let title = document.getElementById("titleUserQuiz");
     title.innerHTML += `
@@ -355,43 +361,43 @@ function renderCurrentUserQuizz(quizz, id) {
 
     let quiz_head = document.getElementById("quizz_head");
     quiz_head.innerHTML += `
-    <div class="modifier" style="padding: 0.rem 0rem;">
+    <div class="modifier" style="padding: 0.2rem 0rem;">
       <a class="btn-floating green create"> 
         <i class="material-icons">add</i>
       </a>
     </div>
     `;
 
-    let sentence0 = document.getElementById("sentence_0");
-
-    if (sentence0 !== undefined && sentence0 !== null) {
-      sentence0.innerHTML += `
-    <a class="btn-floating orange "> 
-      <i class="material-icons">create</i>
-    </a>`;
-    }
-
     const changeTD = document.querySelector(".changeTD"); // Affichera changeTitleDesc
-    const CreateProp = document.querySelector(".create"); // Affichera addNewProp
+    const createProp = document.querySelector(".create"); // Affichera addNewProp
+    const editProp = document.querySelector(".edit_prop"); // Affichera
+    const deleteQuestion = document.querySelector(".delete_forever"); // Afficher un modale
 
-    CreateProp.addEventListener("click", function () {
+    createProp.addEventListener("click", function () {
       // On appuie sur le bouton PLUS
-      var sentence = () => { // Retourne le nombre de Question dans le quiz sélectionné.
+      var sentence = () => {
+        // Retourne le nombre de Question dans le quiz sélectionné.
         let idQ = 0;
-        while(document.querySelector(`#sentence_${idQ}`) !== null) {
-            idQ++;
+        while (document.querySelector(`#sentence_${idQ}`) !== null) {
+          idQ++;
         }
         return idQ;
-      }
-      return addNewProp(id, sentence());
+      };
+      return addNewProp(quiz_id, sentence());
     });
 
     changeTD.addEventListener("click", function () {
-      return changeTitleDesc(quizz,id);
+      return changeTitleDesc(quizz, quiz_id);
     });
+    
+    let deleteForEVER = document.getElementsByClassName("delete_forever");
+    
+    Array.from(deleteForEVER).map(el => el.onclick = (() => {
+      let idQ = el.id;
+      return  deleteQuestionUser(quiz_id, idQ);
+    }));
   }
 }
-
 
 // Fonction qui ajoute une nouvelle proposition à un quiz
 function addNewProp(quizz_id, nbQ) {
@@ -479,6 +485,30 @@ function changeTitleDesc(quizz, quizz_id) {
     sendNewQuizz(title, description, "PUT", quizz_id);
   };
 }
+
+// Fonction qui supprime la question d'un quiz
+function deleteQuestionUser(quiz_id, question_id) {
+  console.debug(`deleteQuestionUser(${quiz_id},${question_id})`);
+  const modify = document.getElementById("id-modify-quizzes-main");
+  const code = `
+  <div id="deleteQuest">
+    <h4>Êtes-vous sur de vouloir surppimer cette question ?<h4>
+    <button class='waves-effect waves-light btn grey' id='no_delete'>Non</button>
+    <button class='waves-effect waves-light btn red' id='delete'>Oui</button>
+   </div> 
+   `;
+
+  modify.innerHTML = code;
+
+  document.getElementById("delete").onclick = () => {
+    sendDeleteQuestion(quiz_id, question_id);
+    document.getElementById("deleteQuest").remove();
+  };
+  document.getElementById("no_delete").onclick = () => {
+    document.getElementById("deleteQuest").remove();
+  };
+}
+
 // quand on clique sur le bouton de login, il nous dit qui on est
 // eslint-disable-next-line no-unused-vars
 const renderUserBtn = () => {

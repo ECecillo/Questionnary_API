@@ -212,7 +212,7 @@ const sendNewQuizz = (titre, desc, Method, quiz_id) => {
       title: titre,
       description: desc,
     };
-    
+
   } else {
     var url = `${state.serverUrl}/quizzes/${quiz_id}/`;
     var quiz = {
@@ -284,4 +284,21 @@ const sendUserProp = (id, idQ, idP, sentence) => {
       };
     })
     .catch(console.error);
+};
+
+// Envoie une requête delete au serveur pour supprimer une question d'un quiz
+// quiz_id: l'id du quiz de la question
+// question_id: l'id de la question à supprimer dans le quiz
+const sendDeleteQuestion = (quizz_id, question_id) => {
+  const url = `${state.serverUrl}/quizzes/${quizz_id}/questions/${question_id}`;
+
+  return (fetch(url, {
+    method: 'DELETE',
+    headers: state.headers()
+  })
+  .then(filterHttpResponse)
+  .then (() => {
+    //le toast pour dire que l'on a bien supprimer le quiz
+    
+  }));
 };
