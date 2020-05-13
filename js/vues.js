@@ -422,7 +422,7 @@ const renderUserBtn = () => {
 function FindNext () {
   var str = document.getElementById ("search").value;
   if (str == "") {
-      alert ("Please enter some text to search!");
+      alert ("Rentrez du texte pour rechercher !");
       return;
   }
 
@@ -434,56 +434,12 @@ function FindNext () {
           // will be the end position of the selection
       found = window.find (str);
   }
-  else {
-      if (document.selection && document.selection.createRange) { // Internet Explorer, Opera before version 10.5
-          var textRange = document.selection.createRange ();
-          if (textRange.findText) {   // Internet Explorer
-              supported = true;
-                  // if some content is selected, the start position of the search 
-                  // will be the position after the start position of the selection
-              if (textRange.text.length > 0) {
-                  textRange.collapse (true);
-                  textRange.move ("character", 1);
-              }
-
-              found = textRange.findText (str);
-              if (found) {
-                  textRange.select ();
-              }
-          }
-      }
-  }
-
   if (supported) {
       if (!found) {
-          alert ("The following text was not found:\n" + str);
+          alert ("Le texte n'a pas été trouvé :\n" + str);
       }
   }
   else {
       alert ("Your browser does not support this example!");
   }
 }
-
-
-/*$(document).ready(function () {
-  $("#search").on("keyup", function () {
-    var value = $(this).val().toLowerCase();
-    $("#id-all-quizzes").filter(function () {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-    });
-  });
-});
-
-function reserch(c){
-  console.debug(`@reserch()`);
-  let main = document.getElementById('id-all-quizzes-main');
-  c = $("search");
-  var value = $(this).val().toLowerCase();
-  quizz.forEach((q) = {
-    if (q=c) {
-      
-    }
-  });
-}
-
-*/
