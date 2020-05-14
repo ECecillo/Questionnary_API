@@ -89,7 +89,7 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
         ${
           userQuiz === true
             ? `
-          <a class="btn-floating orange edit_prop"> 
+          <a id="${q.question_id}" class="btn-floating orange edit_prop"> 
             <i class="material-icons">create</i>
           </a>
           <a id="${q.question_id}" class="btn-floating red delete_forever"> 
@@ -370,8 +370,8 @@ function renderCurrentUserQuizz(quizz, quiz_id) {
 
     const changeTD = document.querySelector(".changeTD"); // Affichera changeTitleDesc
     const createProp = document.querySelector(".create"); // Affichera addNewProp
-    const editProp = document.querySelector(".edit_prop"); // Affichera
-    const deleteQuestion = document.querySelector(".delete_forever"); // Afficher un modale
+    let deleteForEVER = document.getElementsByClassName("delete_forever");
+    let edit_prop = document.getElementsByClassName("edit_prop");
 
     createProp.addEventListener("click", function () {
       // On appuie sur le bouton PLUS
@@ -389,13 +389,23 @@ function renderCurrentUserQuizz(quizz, quiz_id) {
     changeTD.addEventListener("click", function () {
       return changeTitleDesc(quizz, quiz_id);
     });
-    
-    let deleteForEVER = document.getElementsByClassName("delete_forever");
-    
-    Array.from(deleteForEVER).map(el => el.onclick = (() => {
-      let idQ = el.id;
-      return  deleteQuestionUser(quiz_id, idQ);
-    }));
+
+    Array.from(deleteForEVER).map(
+      (el) =>
+        (el.onclick = () => {
+          let idQ = el.id;
+          return deleteQuestionUser(quiz_id, idQ);
+        })
+    );
+
+    Array.from(edit_prop).map(
+      (el) =>
+        (el.onclick = () => {
+          let idQ = el.id;
+          getQuestionData(quiz_id, idQ); // récupère les infos du quiz que l'on a sélectionné.
+          return editUserQuizz(quiz_id, idQ);
+        })
+    );
   }
 }
 
@@ -434,7 +444,7 @@ function addNewProp(quizz_id, nbQ) {
   };
   document.getElementById("create_question").onclick = () => {
     const sentence = document.getElementById("question").value;
-    sendUserProp(quizz_id, idQ, idP, sentence);
+    sendUserProp(quizz_id, idQ, idP, sentence, "POST");
   };
 }
 
@@ -506,6 +516,59 @@ function deleteQuestionUser(quiz_id, question_id) {
   };
   document.getElementById("no_delete").onclick = () => {
     document.getElementById("deleteQuest").remove();
+  };
+}
+
+// Fonction qui Modifi la question et les propositions d'un quiz
+function editUserQuizz(quiz_id, question_id) {
+  console.debug(`editUserQuizz(${quiz_id},${question_id})`);
+  const modify = document.getElementById("id-modify-quizzes-main");
+  getQuestionData(quiz_id, question_id); // récupère les infos du quiz que l'on a sélectionné.
+  let question_info = state.currentQuizz;
+  
+  let idP = 0;
+  let lenghtQuestion = question_info.propositions_number; // Nombre de propostion
+  console.log(lenghtQuestion);
+  const code = `
+    <h4>Modification de la Question<h4>
+    <label>Question :
+      <input placeholder='La nouvelle question' id='question' type='text' class='validate' value="${question_info.sentence}" required>
+    </label>
+    <div id='propostionList'></div>
+    <button class='waves-effect waves-light btn green' id='modify_question'>
+      Modifier la question
+    </button>
+    `;
+
+  modify.innerHTML = code;
+
+  let propositionList = document.getElementById("propostionList");
+  while (idP < lenghtQuestion) {
+    console.log(idP);
+    let propositionHtml = `
+    <label>
+      <input type='radio' name='newQ' checked='true'>
+      <span> Proposition ${idP} :</span>
+      <input id="new_proposition${idP}" type='text' class='validate' value="${(question_info.propositions[idP].content).toString()}" required>
+    </label>
+    `;
+    propositionList.innerHTML += propositionHtml;
+    idP++;
+  }
+  /* 
+  idP++;
+  let html = `
+    <label>
+      <span>Proposition ${idP} :</span>
+      <input placeholder='Votre proposition' id='old_proposition${idP}' type='text' class='validate' value='${question_info.propositions[idP].content}'>
+    </label>`;
+  document
+    .getElementById("old_proposition" + String(idP - 1))
+    .insertAdjacentHTML("afterend", html); */
+
+  document.getElementById("modify_question").onclick = () => {
+    const sentence = document.getElementById("question").value;
+    sendUserProp(quiz_id, question_id, idP, sentence,"PUT", "update");
   };
 }
 

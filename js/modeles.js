@@ -135,7 +135,7 @@ function getQuizzInfo(id) {
 }
 
 // /!\ On récupère les données du quiz grâce à l'id (propositions, questions ...) /!\
-// id: id qui est dans currentQuiz quand on sélectionnera le quiz
+// id: id qui est dans currentQuiz quand on sélectionnera le quiz.
 function getQuizzData(id) {
   console.debug(`@getQuizzData(${id})`);
   const url = `${state.serverUrl}/quizzes/${id}/questions`;
@@ -143,6 +143,20 @@ function getQuizzData(id) {
   return fetch(url, { method: "GET", headers: state.headers() }).then(
     filterHttpResponse
   );
+}
+
+// /!\ Récupère toute les infos liés à une question dans un quiz /!\
+// id: l'id du quiz sélectionné.
+// quest_id: l'id de la question dont on veut les infos.
+const getQuestionData = (id, quest_id) => {
+  console.debug(`getQuestionData(${id})`);
+  const url = `${state.serverUrl}/quizzes/${id}/questions/${quest_id}`;
+
+  return fetch(url, {method: "GET", headers: state.headers()})
+    .then(filterHttpResponse)
+    .then((data) => {
+      state.currentQuizz = data;
+    });
 }
 
 // /!\ Va chercher toutes les infos d'un quizz avec son id, on a ces réponses ect ... /!\
@@ -245,16 +259,22 @@ const sendNewQuizz = (titre, desc, Method, quiz_id) => {
 // id: id du quiz où l'on ajoutera les nouvelles prop.
 // idP: le nombre de proposition.
 // sentence: la question qui sera rattaché au proposition.
-const sendUserProp = (id, idQ, idP, sentence) => {
-  console.debug(`@SendUserProp(${id})`);
-  const url = `${state.serverUrl}/quizzes/${id}/questions/`;
+const sendUserProp = (id, idQ, idP, sentence, methode, useCase) => {
+  console.debug(`@SendUserProp(${id},${idQ},${idP},${sentence},${methode},${useCase})`);
+  let url = `${state.serverUrl}/quizzes/${id}/questions/`;
+  useCase === "update" ? 
+    url = `${state.serverUrl}/quizzes/${id}/questions/${idQ}` 
+    : ""
+  
   const questionObj = {
     question_id: idQ,
     sentence: sentence,
     propositions: [],
   };
-  for (let j = 0; j <= idP; j++) {
-    let prop = document.getElementById("new_proposition" + String(j));
+  
+  for (let j = 0; j <= (useCase === "update" ? idP - 1 : idP ); j++) {
+    let prop = document.getElementById(`new_proposition${j}`);
+    console.log(prop);
     if (prop.previousElementSibling.previousElementSibling.checked == true)
       questionObj.propositions.push({
         content: prop.value,
@@ -268,8 +288,9 @@ const sendUserProp = (id, idQ, idP, sentence) => {
         correct: "true",
       });
   }
+
   return fetch(url, {
-    method: "POST",
+    method: `${methode}`,
     headers: state.headers(),
     body: JSON.stringify(questionObj),
   })
