@@ -447,7 +447,7 @@ function addNewProp(quizz_id, nbQ) {
 }
 
 function createquizz() {
-  if (state.user) {
+  if (state.user) {n
     console.debug(`@createquizz()`);
     let main = document.getElementById("id-my-quizzes-main");
     let code = `
