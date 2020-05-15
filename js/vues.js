@@ -422,8 +422,7 @@ function addNewProp(quizz_id, nbQ) {
     </label>
     <label>
       <input type='radio' name='newQ' checked='true'><span>Proposition ${idP} :</span>
-      <input placeholder='Votre proposition' id='new_proposition${idP}' type='text' class='validate'>
-      <input type='radio'>
+      <input placeholder='Votre proposition' id='new_proposition${idP}' type='text' class='validate modified_proposition'>
     </label>
       <button class='waves-effect waves-light btn' id='create_answer'>Nouvelle proposition</button><br><br>
       <button class='waves-effect waves-light btn' id='create_question'>Ajouter la question</button>
@@ -434,12 +433,11 @@ function addNewProp(quizz_id, nbQ) {
     idP++;
     let html = `
     <label>
-      <input type='radio' name='newQ'>
       <span>Proposition ${idP} :</span>
-      <input placeholder='Votre proposition' id='new_proposition${idP}' type='text' class='validate'>
+      <input placeholder='Votre proposition' id='new_proposition${idP}' type='text' class="validate modified_proposition">
     </label>`;
     document
-      .getElementById("new_proposition" + String(idP - 1))
+      .getElementById(`new_proposition${idP - 1}`)
       .insertAdjacentHTML("afterend", html);
   };
   document.getElementById("create_question").onclick = () => {
@@ -549,22 +547,12 @@ function editUserQuizz(quiz_id, question_id) {
     <label>
       <input type='radio' name='newQ' checked='true'>
       <span> Proposition ${idP} :</span>
-      <input id="new_proposition${idP}" type='text' class='validate' value="${(question_info.propositions[idP].content).toString()}" required>
+      <input id= "proposition${idP}" type='text' class="validate modified_proposition" value="${(question_info.propositions[idP].content).toString()}" required>
     </label>
     `;
     propositionList.innerHTML += propositionHtml;
     idP++;
   }
-  /* 
-  idP++;
-  let html = `
-    <label>
-      <span>Proposition ${idP} :</span>
-      <input placeholder='Votre proposition' id='old_proposition${idP}' type='text' class='validate' value='${question_info.propositions[idP].content}'>
-    </label>`;
-  document
-    .getElementById("old_proposition" + String(idP - 1))
-    .insertAdjacentHTML("afterend", html); */
 
   document.getElementById("modify_question").onclick = () => {
     const sentence = document.getElementById("question").value;

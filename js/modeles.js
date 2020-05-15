@@ -152,12 +152,12 @@ const getQuestionData = (id, quest_id) => {
   console.debug(`getQuestionData(${id})`);
   const url = `${state.serverUrl}/quizzes/${id}/questions/${quest_id}`;
 
-  return fetch(url, {method: "GET", headers: state.headers()})
+  return fetch(url, { method: "GET", headers: state.headers() })
     .then(filterHttpResponse)
     .then((data) => {
       state.currentQuizz = data;
     });
-}
+};
 
 // /!\ Va chercher toutes les infos d'un quizz avec son id, on a ces réponses ect ... /!\
 // id: est l'identifiant du quizz à télécharger
@@ -226,7 +226,6 @@ const sendNewQuizz = (titre, desc, Method, quiz_id) => {
       title: titre,
       description: desc,
     };
-
   } else {
     var url = `${state.serverUrl}/quizzes/${quiz_id}/`;
     var quiz = {
@@ -255,39 +254,44 @@ const sendNewQuizz = (titre, desc, Method, quiz_id) => {
     .catch(console.error);
 };
 
-// Créer des nouvelles questions et proposition.
+// Créer des nouvelles questions et proposition ou les mofifies selon la valeur de methode.
 // id: id du quiz où l'on ajoutera les nouvelles prop.
 // idP: le nombre de proposition.
 // sentence: la question qui sera rattaché au proposition.
-const sendUserProp = (id, idQ, idP, sentence, methode, useCase) => {
+const sendUserProp = (id, idQ, idP, sentence, methode) => {
   console.debug(`@SendUserProp(${id},${idQ},${idP},${sentence},${methode},${useCase})`);
   let url = `${state.serverUrl}/quizzes/${id}/questions/`;
-  useCase === "update" ? 
-    url = `${state.serverUrl}/quizzes/${id}/questions/${idQ}` 
-    : ""
   
+  methode === "PUT"
+    ? (url = `${state.serverUrl}/quizzes/${id}/questions/${idQ}`)
+    : "";
+
   const questionObj = {
     question_id: idQ,
     sentence: sentence,
     propositions: [],
   };
-  
-  for (let j = 0; j <= (useCase === "update" ? idP - 1 : idP ); j++) {
-    let prop = document.getElementById(`new_proposition${j}`);
-    console.log(prop);
-    if (prop.previousElementSibling.previousElementSibling.checked == true)
+
+  let i = 0; // variable pour le numéro de la proposition.
+  let class_prop = document.getElementsByClassName(`modified_proposition`);
+  Array.from(class_prop).map((el) => {
+    let prop = el; // Renvoie le première élément qui contient class_prop en class.
+    if (prop.previousElementSibling.checked === true) {
       questionObj.propositions.push({
         content: prop.value,
-        proposition_id: j,
+        proposition_id: i,
         correct: "false",
       });
-    else
+      i++;
+    } else {
       questionObj.propositions.push({
         content: prop.value,
-        proposition_id: j,
+        proposition_id: i,
         correct: "true",
       });
-  }
+      i++;
+    }
+  });
 
   return fetch(url, {
     method: `${methode}`,
@@ -313,13 +317,12 @@ const sendUserProp = (id, idQ, idP, sentence, methode, useCase) => {
 const sendDeleteQuestion = (quizz_id, question_id) => {
   const url = `${state.serverUrl}/quizzes/${quizz_id}/questions/${question_id}`;
 
-  return (fetch(url, {
-    method: 'DELETE',
-    headers: state.headers()
+  return fetch(url, {
+    method: "DELETE",
+    headers: state.headers(),
   })
-  .then(filterHttpResponse)
-  .then (() => {
-    //le toast pour dire que l'on a bien supprimer le quiz
-    
-  }));
+    .then(filterHttpResponse)
+    .then(() => {
+      //le toast pour dire que l'on a bien supprimer le quiz
+    });
 };
