@@ -130,7 +130,7 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
     } else {
       return `</br>
     <input type="submit" value="${idBtn}" class="btn" id="btn-submit"
-    ${noDisab ? "" : "disabled"} onclick="">`;
+    ${noDisab ? "" : "disabled"}>`;
     }
   }
 
@@ -250,20 +250,12 @@ function renderCurrentQuizz(data) {
   // On les affiche si elles existent
   else {
     main.innerHTML = htmlQuizzesListContent(data);
-    /* 
-    let submit_quiz = document.getElementsByClassName('submit_quiz');
-    Array.from(submit_quizz).map(
-      (el) =>
-        (el.onclick = (ev) => {
-          ev.preventDefault();
-          sendQuizz(el);
-        })
-    ); 
-    */
+    
 
     document.querySelector(
       "#id-all-quizzes-main #quizz_content"
     ).onclick = function submitForm(ev) {
+      console.debug(`${ev}`);
       ev.preventDefault();
       const form = document.getElementById("quizz_content");
       sendQuizz(form);
