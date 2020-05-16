@@ -72,7 +72,7 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
   const Propositions = (prop, id, answer, disabled) =>
     prop.map((p) => {
       return `<label>
-              <input type="radio" name="${id}" value="${p.proposition_id}" ${
+              <input type="radio" name="${id}" class="submit_quiz" value="${p.proposition_id}" ${
         disabled ? "disabled" : ""
       } ${checkAnsw(answer, prop)}>
               <span>${p.content}</span>
@@ -243,7 +243,6 @@ function renderQuizzes() {
 function renderCurrentQuizz(data) {
   console.debug(`@renderCurrentQuizz()`);
   const main = document.getElementById("id-all-quizzes-main");
-  console.debug(`@(${data.created_at})`);
   // On gère si il y a bien des données à afficher
   if (data === undefined) {
     main.innerHTML = "Pas de data";
@@ -251,9 +250,20 @@ function renderCurrentQuizz(data) {
   // On les affiche si elles existent
   else {
     main.innerHTML = htmlQuizzesListContent(data);
+    /* 
+    let submit_quiz = document.getElementsByClassName('submit_quiz');
+    Array.from(submit_quizz).map(
+      (el) =>
+        (el.onclick = (ev) => {
+          ev.preventDefault();
+          sendQuizz(el);
+        })
+    ); 
+    */
+
     document.querySelector(
       "#id-all-quizzes-main #quizz_content"
-    ).onsubmit = function submitForm(ev) {
+    ).onclick = function submitForm(ev) {
       ev.preventDefault();
       const form = document.getElementById("quizz_content");
       sendQuizz(form);
@@ -447,7 +457,8 @@ function addNewProp(quizz_id, nbQ) {
 }
 
 function createquizz() {
-  if (state.user) {n
+  if (state.user) {
+    n;
     console.debug(`@createquizz()`);
     let main = document.getElementById("id-my-quizzes-main");
     let code = `
@@ -523,7 +534,7 @@ function editUserQuizz(quiz_id, question_id) {
   const modify = document.getElementById("id-modify-quizzes-main");
   getQuestionData(quiz_id, question_id); // récupère les infos du quiz que l'on a sélectionné.
   let question_info = state.currentQuizz;
-  
+
   let idP = 0;
   let lenghtQuestion = question_info.propositions_number; // Nombre de propostion
   console.log(lenghtQuestion);
@@ -547,7 +558,9 @@ function editUserQuizz(quiz_id, question_id) {
     <label>
       <input type='radio' name='newQ' checked='true'>
       <span> Proposition ${idP} :</span>
-      <input id= "proposition${idP}" type='text' class="validate modified_proposition" value="${(question_info.propositions[idP].content).toString()}" required>
+      <input id= "proposition${idP}" type='text' class="validate modified_proposition" value="${question_info.propositions[
+      idP
+    ].content.toString()}" required>
     </label>
     `;
     propositionList.innerHTML += propositionHtml;
@@ -556,7 +569,7 @@ function editUserQuizz(quiz_id, question_id) {
 
   document.getElementById("modify_question").onclick = () => {
     const sentence = document.getElementById("question").value;
-    sendUserProp(quiz_id, question_id, idP, sentence,"PUT", "update");
+    sendUserProp(quiz_id, question_id, idP, sentence, "PUT", "update");
   };
 }
 
