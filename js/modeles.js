@@ -185,15 +185,32 @@ function getInfoData(id) {
 // envoie les réponses à un quizz au serveur
 // form est l'objet formData du quizz à envoyer
 // eslint-disable-next-line no-unused-vars
-const sendQuizz = (Sform) => {
+const sendQuizz = (Sform, quiz_id) => {
+  console.debug(`@sendQuiz(${Sform}, ${quiz_id})`);
+  let prop_content = Sform.target;
+  const url = `${state.serverUrl}/quizzes/${quiz_id}/questions/${prop_content.name}/answers/${prop_content.value}`;
+
+  return fetch(url, { method: "POST", headers: state.headers() })
+    .then(filterHttpResponse)
+    .then((res) => {
+      const date = new Date(res.answered_at).toLocaleString();
+      const toast = M.toast({
+        html: `La question ${res.question_id} du quiz d'identifiant ${res.quiz_id} à été validé à ${date}`,
+        classes: "toast-update",
+        displayLength: 5000,
+      }).el;
+      toast.el.onclick = function dismiss() {
+        toast.timeRemaining = 0;
+      };
+      return res;
+    })
+    .catch((err) => `Erreur: ${err}`);
   // form
-  const form = new FormData(Sform);
-  const quiz_id = document.getElementById("quizz_content").dataset.id;
+  // const form = new FormData(Sform);
+  // const quiz_id = document.getElementById("quizz_content").dataset.id; // Récupère l'id du quiz
 
-  console.debug(`@SendQuiz(${form})`);
-
-  const A = Array.from(form);
-
+  // const A = Array.from(form);
+  /* 
   Promise.all(
     A.map((pa) => {
       const url = `${state.serverUrl}/quizzes/${quiz_id}/questions/${pa[0]}/answers/${pa[1]}`;
@@ -213,7 +230,7 @@ const sendQuizz = (Sform) => {
           return res;
         });
     })
-  ).catch((err) => `BOOM ${err}`);
+  ).catch((err) => `Erreur: ${err}`); */
 };
 
 // On envoie le quiz créer par l'utilisateur.
@@ -259,9 +276,11 @@ const sendNewQuizz = (titre, desc, Method, quiz_id) => {
 // idP: le nombre de proposition.
 // sentence: la question qui sera rattaché au proposition.
 const sendUserProp = (id, idQ, idP, sentence, methode) => {
-  console.debug(`@SendUserProp(${id},${idQ},${idP},${sentence},${methode},${useCase})`);
+  console.debug(
+    `@SendUserProp(${id},${idQ},${idP},${sentence},${methode},${useCase})`
+  );
   let url = `${state.serverUrl}/quizzes/${id}/questions/`;
-  
+
   methode === "PUT"
     ? (url = `${state.serverUrl}/quizzes/${id}/questions/${idQ}`)
     : "";

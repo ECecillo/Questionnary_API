@@ -53,6 +53,10 @@ const htmlQuizzesList = (quizzes, curr, total) => {
   return html;
 };
 
+// /!\ Affiche le contenu d'un quiz sélectionné /!\
+// quiz: les informations du quiz sélectionné
+// userQuiz: les informations du quiz d'un utilisateur
+// answer: les informations du quiz sélectionné avec les réponses de l'utilisateur.
 const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
   console.debug(`@htmlQuizzesListContent(${quiz})`);
 
@@ -65,23 +69,28 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
     }
   }
 
-  // /!\ Génère les radios pour les réponses /!\
-  //prop : quizzes.proposition
-  //id: quizzes.quiz_id pour récup l'id du quiz
-  //answer: les réponses qui sont dans la requpête
+  // /!\ On parcours le tableau de proposition et on affiche les valeurs avec l'html /!\
+  //prop : quizzes.proposition.
+  //id: id de la proposition pour la réponse.
+  //answer: Pour remplir le bouton si l'id de la prop correspond à la réponse de l'user.
+  //disabled: permet de rendre les boutons cliquable si l'utilisateur est connecté.
   const Propositions = (prop, id, answer, disabled) =>
     prop.map((p) => {
-      return `<label>
-              <input type="radio" name="${id}" class="submit_quiz" value="${p.proposition_id}" ${
-        disabled ? "disabled" : ""
-      } ${checkAnsw(answer, prop)}>
-              <span>${p.content}</span>
-           </label>`;
+      return `
+      <label>
+        <input type="radio" name="${id}" class="submit_quiz" value="${
+        p.proposition_id
+      }" 
+        ${disabled ? "disabled" : ""}
+        ${checkAnsw(answer, prop)}>
+        <span>${p.content}</span>
+      </label>`;
     });
 
-  // /!\ Pour chaque question on parcours les propositions /!\
-  // question: state.currentQuizzes
+  // /!\ Affiche les propositions en rapport avec l'id de la question /!\
+  // question: le contenu d'une question que l'on récupère à partir du quiz.
   // answers:
+  //disabled:
   const Question = (questions, answers, disabled) =>
     questions.map(
       (q) =>
@@ -102,23 +111,25 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
           q.propositions,
           q.question_id,
           answers !== undefined
-            ? answers.find((elt) => elt.q === q.question_id)
+            ? answers.find((elt) => elt.q === q.question_id) // Pour check si c'est une réponse de l'utilisateur ou non.
             : undefined,
-          disabled
+          disabled // Si c'est pas une réponse on ne remplit pas le bouton
         ).join("")}`
     );
+
   //On déclare ces deux consantes qui serviront pour l'évalution du submit
   const noDisabled = quiz.info.open && state.user !== undefined;
   const noSubmit =
     state.user !== undefined && quiz.info.owner_id === state.user.user_id;
-  // /!\ Fonction qui contient toute les conditions qui doivennt être remplis pour le submit /!\
+
+  // /!\ Fonction qui selon l'état de l'user et du quiz va afficher un message dans le bouton situé à la fin du quiz /!\
   // quiz: le tableau du quiz que l'utilisateur à choisi
   function checkValidate(quiz) {
     const btnDisplay = !quiz.info.open
       ? "Quiz fermé"
       : state.user === undefined
       ? "Utilisateur non connecté"
-      : "Répondre";
+      : "Sélectionnés les réponses";
 
     return RenderSubButt(noSubmit, noDisabled, btnDisplay);
   }
@@ -129,14 +140,16 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
       return "";
     } else {
       return `</br>
-    <input type="submit" value="${idBtn}" class="btn" id="btn-submit"
-    ${noDisab ? "" : "disabled"}>`;
+    <input value="${idBtn}" class="waves-effect waves-light btn orange" ${
+        noDisab ? "" : "disabled"
+      }>`;
     }
   }
 
-  var date = quiz.info.created_at;
-  date = new Date(date).toLocaleString();
-  // /!\ L'html qui sera mis dans RenderCurrentQuiz pour afficher le titre, desc ... /!\
+  // On récupère la date du quiz que l'on a sélectionné et on la formate.
+  let date = new Date(quiz.info.created_at).toLocaleString();
+
+  // /!\ L'html qui sera affiché lorsque l'on cliquera sur un quiz /!\
   const Quizhtml = `
   <div class="card indigo lighten-5">
     <div class="card-content black-text">
@@ -177,17 +190,7 @@ function renderQuizzes() {
     state.quizzes.currentPage,
     state.quizzes.nbPages
   );
-  /* 
-  let ul = document.createElement("ul");
-  ul.className = "collection-item modal-trigger cyan lighten-5";
-  let bouton = document.createElement("button");
-  bouton.className = "waves-effect waves-light btn black-text cyan lighten-4";
-  bouton.onclick = () => createquizz();
-  bouton.innerHTML = "Nouveau Quizz";
-  ul.appendChild(bouton);
-  let collection = document.getElementById("collection");
-  collection.firstElementChild.before(ul);
- */
+
   // /!\ il faut que l'affectation usersElt.innerHTML = ... ait eu lieu pour
   // /!\ que prevBtn, nextBtn et quizzes en soient pas null
   // les éléments à mettre à jour : les boutons
@@ -227,7 +230,7 @@ function renderQuizzes() {
       const Info = state.quizzes.results.find(
         (e) => e.quiz_id === Number(quizzId)
       );
-      return renderCurrentQuizz({ info: Info, questions: data });
+      return renderCurrentQuizz({ info: Info, questions: data }, quizzId);
     });
   }
 
@@ -240,8 +243,8 @@ function renderQuizzes() {
 // pour un quizz selectionné, on affiche les données du quizz en question
 // C'est à dire que l'on affiche le formulaire pour séléctionner les réponses des questions
 // ainsi que leurs questions
-function renderCurrentQuizz(data) {
-  console.debug(`@renderCurrentQuizz()`);
+function renderCurrentQuizz(data, quiz_id) {
+  console.debug(`@renderCurrentQuizz(${data}, ${quiz_id})`);
   const main = document.getElementById("id-all-quizzes-main");
   // On gère si il y a bien des données à afficher
   if (data === undefined) {
@@ -250,16 +253,27 @@ function renderCurrentQuizz(data) {
   // On les affiche si elles existent
   else {
     main.innerHTML = htmlQuizzesListContent(data);
-    
+    if (state.user !== undefined) {
+    // Pour la fonctionnalité optio changer le querySelector sur les boutons et remplacer
+    // onsubmit par onchange.
+    let submit_quiz = document.getElementsByClassName("submit_quiz");
+      Array.from(submit_quiz).map(
+        (el) =>
+          (el.onchange = (ev) => {
+            ev.preventDefault();
+            sendQuizz(ev, quiz_id);
+          })
+      );
+    }
 
-    document.querySelector(
+    /* document.querySelector( 
       "#id-all-quizzes-main #quizz_content"
-    ).onclick = function submitForm(ev) {
+    ).onsubmit = (ev) => { // Si on met onclick on va déclencher le form pour chaque clique de bouton
       console.debug(`${ev}`);
       ev.preventDefault();
       const form = document.getElementById("quizz_content");
       sendQuizz(form);
-    };
+    }; */
   }
 }
 
@@ -450,7 +464,6 @@ function addNewProp(quizz_id, nbQ) {
 
 function createquizz() {
   if (state.user) {
-    n;
     console.debug(`@createquizz()`);
     let main = document.getElementById("id-my-quizzes-main");
     let code = `
