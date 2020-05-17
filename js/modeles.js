@@ -237,3 +237,52 @@ const sendUserQuizz = (id, idQ, sentence) => {
     .catch(console.error));
 
 };
+
+
+  console.debug(`@search()`);
+  const quizzList = document.getElementById('id-all-quizzes');
+  const quizzQuery = document.querySelector('#id-all-quizzes');
+  const searchBar = document.getElementById('search');
+  let hpCharacters = [];
+  
+  searchBar.addEventListener('keyup', (e) => {
+      console.log(e.target.value.toLowerCase());
+      const searchString = e.target.value.toLowerCase();
+  
+      const filteredCharacters = state.quizzes.results.filter((quizz) => {
+          console.log(quizz);
+        return (
+              quizz.title.toLowerCase().includes(searchString) ||
+              quizz.description.toLowerCase().includes(searchString)
+          );
+      });
+      displayCharacters(filteredCharacters);
+  });
+  
+  const loadCharacters = async () => {
+      try {
+        const url = `${state.serverUrl}/search/?q=${searchString}`;
+        return fetch(url, { method: "GET", headers: state.headers()})
+          .then(filterHttpResponse)
+          .then((data) => {
+            displayCharacters(data);
+            console.log(data);
+          })
+      } catch (err) {
+          //console.error(err);
+      }
+  };
+  
+  const displayCharacters = (quizzes) => {
+      const htmlString = quizzes
+          .map((quizz) => {
+              return `
+                  <h2>${quizz.title}</h2>
+                  <p>House: ${quizz.description}</p>
+          `;
+          })
+          .join('');
+      quizzList.innerHTML = htmlString;
+  };
+  
+  loadCharacters();
