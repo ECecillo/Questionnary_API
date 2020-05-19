@@ -127,9 +127,11 @@ function getQuizzInfo(id) {
   console.debug(`@getQuizzInfo(${id})`);
   const url = `${state.serverUrl}/quizzes/${id}`;
 
-  return fetch(url, { method: "GET", headers: state.headers() }).then(
-    filterHttpResponse
-  );
+  return fetch(url, { method: "GET", headers: state.headers() })
+    .then(filterHttpResponse)
+    .then((data) => {
+      state.currentQuizz = data;
+    });
 }
 
 // /!\ On récupère les données du quiz grâce à l'id (propositions, questions ...) /!\
@@ -149,7 +151,7 @@ function getQuizzData(id) {
 function getInfoData(id) {
   console.debug(`@getInfoData(${id})`);
   const Info = `${state.serverUrl}/quizzes/${id}`;
-  const Data = `${urlInfo}/questions`;
+  const Data = `${Info}/questions`;
 
   return fetch(Data, { method: "GET", headers: state.headers() })
     .then(filterHttpResponse)
@@ -243,9 +245,14 @@ const sendUserQuizz = (id, idQ, sentence) => {
   const quizzList = document.getElementById('id-all-quizzes');
   const quizzQuery = document.querySelector('#id-all-quizzes');
   const searchBar = document.getElementById('search');
+  const searchButton = document.getElementById('searchButton');
   let hpCharacters = [];
   
-  searchBar.addEventListener('keyup', (e) => {
+  searchButton.onclick = (ev) => {
+    const searchString = searchBar.value.toLowerCase();
+    loadCharacters(searchString);
+  }
+  /*searchBar.addEventListener('keyup', (e) => {
       console.log(e.target.value.toLowerCase());
       const searchString = e.target.value.toLowerCase();
   
@@ -256,22 +263,29 @@ const sendUserQuizz = (id, idQ, sentence) => {
               quizz.description.toLowerCase().includes(searchString)
           );
       });
-      displayCharacters(filteredCharacters);
-  });
+      //displayCharacters(filteredCharacters);
+  });*/
   
-  const loadCharacters = async () => {
+  const loadCharacters = async (searchString) => {
       try {
         const url = `${state.serverUrl}/search/?q=${searchString}`;
         return fetch(url, { method: "GET", headers: state.headers()})
           .then(filterHttpResponse)
           .then((data) => {
-            displayCharacters(data);
-            console.log(data);
+            console.debug(data);
+            /*let quizzid = data[0].quiz_id;
+            let quizz = getQuizzInfo(quizzid);
+            //console.debug(quizz);
+            console.debug(state.currentQuizz);
+            quizz = Array.from(state.currentQuizz);*/
+            quizzList.innerHTML = htmlQuizzesList(data);
+            //console.log(data);
           })
       } catch (err) {
           //console.error(err);
       }
   };
+  
   
   const displayCharacters = (quizzes) => {
       const htmlString = quizzes
@@ -285,4 +299,4 @@ const sendUserQuizz = (id, idQ, sentence) => {
       quizzList.innerHTML = htmlString;
   };
   
-  loadCharacters();
+  //loadCharacters();
