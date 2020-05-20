@@ -62,7 +62,8 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
 
   //Fonction qui va s'occuper de cocher les bonnes réponses pour l'affichage des réponses
   function checkAnsw(answer, proposition) {
-    if (answer !== undefined && answer.p === proposition.proposition_id) {
+    // console.log(answer.proposition_id);
+    if (answer !== undefined && answer.proposition_id === proposition.proposition_id) {
       return "checked";
     } else {
       return "";
@@ -89,8 +90,8 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
 
   // /!\ Affiche les propositions en rapport avec l'id de la question /!\
   // question: le contenu d'une question que l'on récupère à partir du quiz.
-  // answers:
-  //disabled:
+  // answers: un tableau d'object dans lequelle on a pour chaque question_id l'id de la prop
+  // disabled: permet de rendre les inputs cliquable ou non si user connecté.
   const Question = (questions, answers, disabled) =>
     questions.map(
       (q) =>
@@ -111,7 +112,7 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
           q.propositions,
           q.question_id,
           answers !== undefined
-            ? answers.find((elt) => elt.q === q.question_id) // Pour check si c'est une réponse de l'utilisateur ou non.
+            ? answers.find((elt) => elt.question_id === q.question_id) // Pour check si c'est une réponse de l'utilisateur ou non.
             : undefined,
           disabled // Si c'est pas une réponse on ne remplit pas le bouton
         ).join("")}`
@@ -165,7 +166,7 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
           ${Question(quiz.questions, answers, !noDisabled || noSubmit).join(
             "<br>"
           )}
-          ${checkValidate(quiz, answers)} 
+          ${checkValidate(quiz)} 
         </form>
     </div>
   </div>`;
@@ -210,14 +211,6 @@ function renderQuizzes() {
   if (prevBtn) prevBtn.onclick = clickBtnPager;
   if (nextBtn) nextBtn.onclick = clickBtnPager;
 
-  //Parcours json response
-  function maj_url(url_data) {
-    const title = url_data.map((contenu, indx) => ({
-      titre: desc.title,
-      descript: desc.description,
-    }));
-  }
-
   // qd on clique sur un quizz, on change sont contenu avant affichage
   // l'affichage sera automatiquement déclenché par materializecss car on
   // a définit .modal-trigger et data-target="id-modal-quizz-menu" dans le HTML
@@ -252,7 +245,9 @@ function renderCurrentQuizz(data, quiz_id) {
   }
   // On les affiche si elles existent
   else {
-    main.innerHTML = htmlQuizzesListContent(data);
+    retrieveAnswer(quiz_id).then((quiz_answ) => {
+      main.innerHTML = htmlQuizzesListContent(data, false, quiz_answ);  
+    });
     if (state.user !== undefined) {
     // Pour la fonctionnalité optio changer le querySelector sur les boutons et remplacer
     // onsubmit par onchange.

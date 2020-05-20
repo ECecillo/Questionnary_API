@@ -195,7 +195,7 @@ const sendQuizz = (Sform, quiz_id) => {
     .then((res) => {
       const date = new Date(res.answered_at).toLocaleString();
       const toast = M.toast({
-        html: `La question ${res.question_id} du quiz d'identifiant ${res.quiz_id} à été validé à ${date}`,
+        html: `La question ${res.question_id} du quiz d'identi  fiant ${res.quiz_id} à été validé à ${date}`,
         classes: "toast-update",
         displayLength: 5000,
       }).el;
@@ -343,5 +343,26 @@ const sendDeleteQuestion = (quizz_id, question_id) => {
     .then(filterHttpResponse)
     .then(() => {
       //le toast pour dire que l'on a bien supprimer le quiz
+    });
+};
+
+// /!\ Fonction qui a pour intérret de récupérer les réponses de l'utilisateur. /!\
+// quiz_id: l'id du quiz que l'on a sélectionné et où l'on veut récupérer les réponses.
+const retrieveAnswer = (quiz_id) => {
+  console.debug(`retrieveAnwswer(${quiz_id})`);
+  const url = `${state.serverUrl}/users/answers`;
+  
+   return fetch(url, {
+    method: "GET",
+    headers: state.headers(),
+  })
+    .then(filterHttpResponse)
+    .then((data) => {
+      let quiz_data = data.find((el) => el.quiz_id === parseInt(quiz_id, 10));
+      let quiz_answ = quiz_data.answers.map((n) => {
+        delete n.answered_at;
+        return n;
+      });
+      return quiz_answ; // renvoie l'object avec proposition_id et question_id.
     });
 };
