@@ -271,16 +271,18 @@ const sendUserQuizz = (id, idQ, sentence) => {
         const url = `${state.serverUrl}/search/?q=${searchString}`;
         return fetch(url, { method: "GET", headers: state.headers()})
           .then(filterHttpResponse)
-          .then((data) => {
+          .then((data) => data.map(d => getQuizzInfo(d.quiz_id)))
+          Promise.all();
+          /*.then((data) => {
             console.debug(data);
-            /*let quizzid = data[0].quiz_id;
+            let quizzid = data.quiz_id;
             let quizz = getQuizzInfo(quizzid);
-            //console.debug(quizz);
+            console.debug(quizz);
             console.debug(state.currentQuizz);
-            quizz = Array.from(state.currentQuizz);*/
-            quizzList.innerHTML = htmlQuizzesList(data);
+            quizz = Array.from(state.currentQuizz);
+            quizzList.innerHTML = htmlQuizzesList(quizz);
             //console.log(data);
-          })
+          })*/
       } catch (err) {
           //console.error(err);
       }
