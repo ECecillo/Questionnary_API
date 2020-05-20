@@ -281,16 +281,17 @@ const sendUserQuizz = (id, idQ, sentence) => {
         return fetch(url, { method: "GET", headers: state.headers()})
           .then(filterHttpResponse)
           .then((data) => {
-            let quizzid = data.map(d => d.quiz_id);
-            for(let i=0; i<quizzid.length; i++)
+            Promise.all(data.map(d => getQuizzInfo(d.quiz_id)))
+              .then(quizzList.innerHTML = htmlQuizzesList(data))
+            /*for(let i=0; i<quizzid.length; i++)
             {
               //let quizz = timeout(1000, getQuizzInfo(quizzid[i]));
               let quizz = getQuizzInfo(quizzid[i]);
               console.debug(quizz);
               
-            }
+            }*/
             //console.debug(quizz);
-            quizzList.innerHTML = htmlQuizzesList(quizzid);
+            //quizzList.innerHTML = htmlQuizzesList(quizzid);
           })
           /*.then((data) => {
             console.debug(data);
