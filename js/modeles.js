@@ -131,6 +131,8 @@ function getQuizzInfo(id) {
     .then(filterHttpResponse)
     .then((data) => {
       state.currentQuizz = data;
+      return data;
+      //console.debug(data);
     });
 }
 
@@ -281,8 +283,13 @@ const sendUserQuizz = (id, idQ, sentence) => {
         return fetch(url, { method: "GET", headers: state.headers()})
           .then(filterHttpResponse)
           .then((data) => {
-            Promise.all(data.map(d => getQuizzInfo(d.quiz_id)))
-              .then(quizzList.innerHTML = htmlQuizzesList(data))
+            const dataQuiz_id = data.map((q) => q.quiz_id);
+            const dataInfoQuizz = dataQuiz_id.map(d => getQuizzInfo(d));
+            Promise.all(dataInfoQuizz)
+              .then(dataTab => quizzList.innerHTML = htmlQuizzesList(dataTab));
+              console.debug(dataInfoQuizz);
+              console.debug(dataQuiz_id);
+              console.debug(data);
             /*for(let i=0; i<quizzid.length; i++)
             {
               //let quizz = timeout(1000, getQuizzInfo(quizzid[i]));
@@ -301,7 +308,7 @@ const sendUserQuizz = (id, idQ, sentence) => {
             console.debug(quizz);
             console.debug(state.currentQuizz);
             quizz = Array.from(state.currentQuizz);
-            quizzList.innerHTML = htmlQuizzesList(quizz);
+            quizzList.innerHTML = htmlQuizzesList(data);
             //console.log(data);
           })*/
       } catch (err) {
