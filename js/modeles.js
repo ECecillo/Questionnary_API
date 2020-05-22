@@ -248,8 +248,13 @@ const sendUserQuizz = (id, idQ, sentence) => {
   const quizzQuery = document.querySelector('#id-all-quizzes');
   const searchBar = document.getElementById('search');
   const searchButton = document.getElementById('searchButton');
+  const closebutton = document.getElementById('closebutton');
   let hpCharacters = [];
   
+  closebutton.onclick = (ev) => {
+    
+  }
+
   searchButton.onclick = (ev) => {
     const searchString = searchBar.value.toLowerCase();
     loadCharacters(searchString);
