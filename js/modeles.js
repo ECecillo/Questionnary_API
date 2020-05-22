@@ -105,7 +105,7 @@ const getUserQuizzes = (p = 1) => {
   // le téléchargement est asynchrone, là màj de l'état et le rendu se fait dans le '.then'
   return fetch(url, { method: "GET", headers: state.headers() })
     .then(filterHttpResponse)
-    .then(renderUserQuizzes);
+    .then(CreateQuizzButt);
 };
 
 // mise-à-jour asynchrone de l'état avec les informations de l'utilisateur

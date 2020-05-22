@@ -142,10 +142,10 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
     if (noSub) {
       return "";
     } else {
-      return `</br>
+      return `<br>
     <input value="${idBtn}" class="waves-effect waves-light btn orange" ${
         noDisab ? "" : "disabled"
-      }>`;
+      } style="margin-top: 2rem;">`;
     }
   }
 
@@ -165,10 +165,8 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
         <p>${quiz.info.description}</p>
        </div>
        <form id="quizz_content" data-id="${quiz.info.quiz_id}">
-          ${Question(quiz.questions, answers, !noDisabled || noSubmit).join(
-            "<br>"
-          )}
-          ${checkValidate(quiz)} 
+          ${Question(quiz.questions, answers, !noDisabled || noSubmit).join("")}
+          ${checkValidate(quiz)}
         </form>
     </div>
   </div>`;
@@ -248,11 +246,12 @@ function renderCurrentQuizz(data, quiz_id) {
   // On les affiche si elles existent
   else {
     retrieveAnswer(quiz_id).then((quiz_answ) => {
+      // Récupère les réponses.
       if (quiz_answ === undefined) {
-        main.innerHTML = htmlQuizzesListContent(data);
+        // Si on a pas soumis de réponse.
+        main.innerHTML = htmlQuizzesListContent(data); // On affiche le quizz normalement.
         if (state.user !== undefined) {
-          // Pour la fonctionnalité optio changer le querySelector sur les boutons et remplacer
-          // onsubmit par onchange.
+          // Si l'utilisateur est connecté il peut répondre aux quizz.
           let submit_quiz = document.getElementsByClassName("submit_quiz");
           Array.from(submit_quiz).map(
             (el) =>
@@ -263,7 +262,7 @@ function renderCurrentQuizz(data, quiz_id) {
           );
         }
       } else {
-        main.innerHTML = htmlQuizzesListContent(data, false, quiz_answ);
+        main.innerHTML = htmlQuizzesListContent(data, false, quiz_answ); // On affiche le quiz avec les réponses remplit.
         if (state.user !== undefined) {
           // Si user connecté il peut répondre ou changer ces réponses au quizz.
           let submit_quiz = document.getElementsByClassName("submit_quiz");
@@ -277,22 +276,9 @@ function renderCurrentQuizz(data, quiz_id) {
         }
       }
     });
-
-    /* document.querySelector( 
-      "#id-all-quizzes-main #quizz_content"
-    ).onsubmit = (ev) => { // Si on met onclick on va déclencher le form pour chaque clique de bouton
-      console.debug(`${ev}`);
-      ev.preventDefault();
-      const form = document.getElementById("quizz_content");
-      sendQuizz(form);
-    }; */
   }
 }
-
-//Il faudrait attribuer à chaque question un id, puis demander le nombre de réponses par id de question, et ensuite attribuer un id
-//pour chaque réponses également
-
-// On affiche la liste des quizzes disponibles de l'utilisateur actuellement connecté
+// On affiche la liste des quizzes disponibles de l'utilisateur.
 const QuizzUtilisateur = (quizzes) => {
   console.debug("@htmlUserQuizzes()");
 
@@ -301,38 +287,32 @@ const QuizzUtilisateur = (quizzes) => {
   return quizzesList;
 };
 
-// On gère l'affichage des quizzes sélectionnés mais ainsi que
-// l'affichage de la liste des quizzes de l'utilisateur connecté
-function renderUserQuizzes(quizz) {
-  console.debug(`@renderUserQuizzes()`);
+// Affiche la liste des quizz et le bouton pour ajouter un nouveau quizz.
+// quizz: la liste de quiz.
+function CreateQuizzButt(quizz) {
+  console.debug(`@CreateQuizzButt()`);
 
   // les éléments à mettre à jour : le conteneur pour la liste des quizz de l'user
   const usersElt = document.getElementById("id-my-quizzes-list");
   const main = document.getElementById("id-my-quizzes-main");
-
   //On gère si l'utilisateur possède un/des quizz/es
-  if (quizz === undefined) {
-    usersElt.innerHTML =
-      "Vous n'avez pas de quiz, veuillez vérifier votre connexion";
-  } else {
-    usersElt.innerHTML = QuizzUtilisateur(quizz);
+  usersElt.innerHTML = QuizzUtilisateur(quizz);
 
-    let RenderAddButt = () => {
-      let div = document.createElement("div");
-      div.className = "fixed-action-btn";
+  let RenderAddButt = () => {
+    // Créer un bouton ajouter
+    let div = document.createElement("div");
+    div.className = "fixed-action-btn";
 
-      let a = document.createElement("a");
-      a.className = "btn-floating btn-large red";
-      a.innerHTML = `<i class="large material-icons">add</i>`;
-      a.onclick = () => createquizz();
+    let a = document.createElement("a");
+    a.className = "btn-floating btn-large red";
+    a.innerHTML = `<i class="large material-icons">add</i>`;
+    a.onclick = () => createquizz();
 
-      div.appendChild(a);
-      let div_UserQ = document.getElementById("id-my-quizzes");
-      div_UserQ.firstElementChild.before(div);
-    };
-
+    div.appendChild(a);
+    let div_UserQ = document.getElementById("id-my-quizzes");
+    div_UserQ.firstElementChild.before(div);
     RenderAddButt();
-  }
+  };
 
   //Si aucun quizz n'est séléctionné
   main.innerHTML = "Pas de quiz séléctioné";
@@ -343,7 +323,8 @@ function renderUserQuizzes(quizz) {
   function clickQuizz() {
     const quizzId = this.dataset.quizzid;
     return getQuizzData(quizzId).then((quizzData) => {
-      //On récupère les infos du quizz
+      // On affiche les infos du quiz sélectionné en fonction de son id.
+      //On récupère les infos du quizz.
       const quizzInfo = quizz.find((e) => e.quiz_id === Number(quizzId));
       return renderCurrentUserQuizz(
         { info: quizzInfo, questions: quizzData },
@@ -596,18 +577,13 @@ const renderUserBtn = () => {
   const btn = document.getElementById("id-login");
   btn.onclick = () => {
     if (state.user) {
-      // eslint-disable-next-line no-alert
-      /* alert(
-        `Bonjour ${state.user.firstname} ${state.user.lastname.toUpperCase()}` 
-      ); */
       getUser();
-      createquizz();
       document.getElementById(
         "content-logout"
       ).innerHTML = `<h5> ${state.user.lastname.toUpperCase()} ${
         state.user.firstname
       } (${state.user.user_id}) <br />
-        Vous êtes l'auteur de </h5>`;
+        Vous êtes l'auteur de</h5>`;
       document.getElementById("id-logout").onclick = function () {
         state.xApiKey = "";
         getUser();
