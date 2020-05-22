@@ -351,18 +351,26 @@ const sendDeleteQuestion = (quizz_id, question_id) => {
 const retrieveAnswer = (quiz_id) => {
   console.debug(`retrieveAnwswer(${quiz_id})`);
   const url = `${state.serverUrl}/users/answers`;
-  
-   return fetch(url, {
+
+  return fetch(url, {
     method: "GET",
     headers: state.headers(),
   })
     .then(filterHttpResponse)
     .then((data) => {
-      let quiz_data = data.find((el) => el.quiz_id === parseInt(quiz_id, 10));
-      let quiz_answ = quiz_data.answers.map((n) => {
-        delete n.answered_at;
-        return n;
-      });
-      return quiz_answ; // renvoie l'object avec proposition_id et question_id.
+      if (Array.isArray(data) && data.length) {
+        // On check une première fois si le tableau est vide (pas de réponse)
+        let quiz_data = data.find((el) => el.quiz_id === parseInt(quiz_id, 10));
+        if (quiz_data !== undefined) {
+          // On check si on a répondu au quiz.
+          let quiz_answ = quiz_data.answers.map((n) => {
+            delete n.answered_at;
+            return n;
+          });
+          return quiz_answ; // renvoie l'object avec proposition_id et question_id.
+        }
+      } else {
+        return undefined;
+      }
     });
 };

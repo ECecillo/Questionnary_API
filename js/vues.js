@@ -62,8 +62,10 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
 
   //Fonction qui va s'occuper de cocher les bonnes réponses pour l'affichage des réponses
   function checkAnsw(answer, proposition) {
-    // console.log(answer.proposition_id);
-    if (answer !== undefined && answer.proposition_id === proposition.proposition_id) {
+    if (
+      answer !== undefined &&
+      answer.proposition_id === proposition.proposition_id
+    ) {
       return "checked";
     } else {
       return "";
@@ -83,7 +85,7 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
         p.proposition_id
       }" 
         ${disabled ? "disabled" : ""}
-        ${checkAnsw(answer, prop)}>
+        ${checkAnsw(answer, p)}>
         <span>${p.content}</span>
       </label>`;
     });
@@ -246,20 +248,35 @@ function renderCurrentQuizz(data, quiz_id) {
   // On les affiche si elles existent
   else {
     retrieveAnswer(quiz_id).then((quiz_answ) => {
-      main.innerHTML = htmlQuizzesListContent(data, false, quiz_answ);  
+      if (quiz_answ === undefined) {
+        main.innerHTML = htmlQuizzesListContent(data);
+        if (state.user !== undefined) {
+          // Pour la fonctionnalité optio changer le querySelector sur les boutons et remplacer
+          // onsubmit par onchange.
+          let submit_quiz = document.getElementsByClassName("submit_quiz");
+          Array.from(submit_quiz).map(
+            (el) =>
+              (el.onchange = (ev) => {
+                ev.preventDefault();
+                sendQuizz(ev, quiz_id);
+              })
+          );
+        }
+      } else {
+        main.innerHTML = htmlQuizzesListContent(data, false, quiz_answ);
+        if (state.user !== undefined) {
+          // Si user connecté il peut répondre ou changer ces réponses au quizz.
+          let submit_quiz = document.getElementsByClassName("submit_quiz");
+          Array.from(submit_quiz).map(
+            (el) =>
+              (el.onchange = (ev) => {
+                ev.preventDefault();
+                sendQuizz(ev, quiz_id);
+              })
+          );
+        }
+      }
     });
-    if (state.user !== undefined) {
-    // Pour la fonctionnalité optio changer le querySelector sur les boutons et remplacer
-    // onsubmit par onchange.
-    let submit_quiz = document.getElementsByClassName("submit_quiz");
-      Array.from(submit_quiz).map(
-        (el) =>
-          (el.onchange = (ev) => {
-            ev.preventDefault();
-            sendQuizz(ev, quiz_id);
-          })
-      );
-    }
 
     /* document.querySelector( 
       "#id-all-quizzes-main #quizz_content"
