@@ -244,15 +244,14 @@ const sendUserQuizz = (id, idQ, sentence) => {
 
 
   console.debug(`@search()`);
-  const quizzList = document.getElementById('id-all-quizzes');
-  const quizzQuery = document.querySelector('#id-all-quizzes');
+  const quizzList = document.getElementById('id-all-quizzes-list');
   const searchBar = document.getElementById('search');
   const searchButton = document.getElementById('searchButton');
   const closebutton = document.getElementById('closebutton');
   let hpCharacters = [];
   
   closebutton.onclick = (ev) => {
-    
+    renderQuizzes();
   }
 
   searchButton.onclick = (ev) => {
