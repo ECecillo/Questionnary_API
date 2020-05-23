@@ -156,8 +156,8 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
   const Quizhtml = `
   <div class="card indigo lighten-5">
     <div class="card-content black-text">
-      <div id="quizz_head">
-        <span id="titleUserQuiz" class="card-title">
+      <div ${userQuiz === true ? `id="quizz_head"` : ""}>
+        <span ${userQuiz === true ? `id="titleUserQuiz"` : ""} class="card-title">
           ${quiz.info.title}
         </span>
         <p>Créer le ${date} par <a class="chip"> ${quiz.info.owner_id}
@@ -412,6 +412,8 @@ function renderSmallFloatingObject(color, nameOfIcon, className, divToAppend) {
 // Pour un quizz selectionné, on affiche les données du quizz en question
 // C'est à dire que l'on affiche le formulaire pour séléctionner les réponses des questions
 // ainsi que leurs questions. Mais cette fois pour les quizzes de l'utilisateur
+//quiz: le contenu du quiz sur lequel on a cliqué.
+//quiz_id: l'id du quiz sur lequel on a cliqué.
 function renderCurrentUserQuizz(quizz, quiz_id) {
   console.debug(`@renderCurrentUserQuizz(${quizz}, ${quiz_id})`);
   const main = document.getElementById("id-my-quizzes-main");
