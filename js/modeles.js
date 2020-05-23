@@ -245,6 +245,7 @@ const sendUserQuizz = (id, idQ, sentence) => {
 
   console.debug(`@search()`);
   const quizzList = document.getElementById('id-all-quizzes-list');
+  const quizzListQuery = document.querySelectorAll('#id-all-quizzes-list');
   const searchBar = document.getElementById('search');
   const searchButton = document.getElementById('searchButton');
   const closebutton = document.getElementById('closebutton');
@@ -290,7 +291,22 @@ const sendUserQuizz = (id, idQ, sentence) => {
             const dataQuiz_id = data.map((q) => q.quiz_id);
             const dataInfoQuizz = dataQuiz_id.map(d => getQuizzInfo(d));
             Promise.all(dataInfoQuizz)
-              .then(dataTab => quizzList.innerHTML = htmlQuizzesList(dataTab));
+              .then(dataTab => quizzList.innerHTML = htmlQuizzesList(dataTab))
+              .then(renderQuizzesSearch())
+              /*const quizzes = document.querySelectorAll("#id-all-quizzes-list li");
+                quizzes.forEach((q) => {
+                  q.onclick = () => {
+                    console.log(`${this}`);
+                    const quizzId = this.dataset.quizzid;
+                console.debug(`@clickQuiz(${quizzId})`);
+                state.currentQuizz = quizzId;
+            
+                return getQuizzData(quizzId).then((data) => {
+                  const Info = state.quizzes.results.find((e) => e.quiz_id === Number(quizzId));
+                  return renderCurrentQuizz({ info: Info, questions: data });
+                });
+                  }
+                })*/
               console.debug(dataInfoQuizz);
               console.debug(dataQuiz_id);
               console.debug(data);
