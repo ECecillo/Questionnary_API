@@ -290,29 +290,36 @@ const QuizzUtilisateur = (quizzes) => {
 // Affiche la liste des quizz et le bouton pour ajouter un nouveau quizz.
 // quizz: la liste de quiz.
 function CreateQuizzButt(quizz) {
-  console.debug(`@CreateQuizzButt()`);
+  console.debug(`@renderUserQuizzes()`);
 
   // les éléments à mettre à jour : le conteneur pour la liste des quizz de l'user
   const usersElt = document.getElementById("id-my-quizzes-list");
   const main = document.getElementById("id-my-quizzes-main");
+
   //On gère si l'utilisateur possède un/des quizz/es
-  usersElt.innerHTML = QuizzUtilisateur(quizz);
+  if (quizz === undefined) {
+    usersElt.innerHTML =
+      "Vous n'avez pas de quiz, veuillez vérifier votre connexion";
+  } else {
+    usersElt.innerHTML = QuizzUtilisateur(quizz);
 
-  let RenderAddButt = () => {
-    // Créer un bouton ajouter
-    let div = document.createElement("div");
-    div.className = "fixed-action-btn";
+    let RenderAddButt = () => {
+      let div = document.createElement("div");
+      div.className = "fixed-action-btn";
 
-    let a = document.createElement("a");
-    a.className = "btn-floating btn-large red";
-    a.innerHTML = `<i class="large material-icons">add</i>`;
-    a.onclick = () => createquizz();
+      let a = document.createElement("a");
+      a.className = "btn-floating btn-large red";
+      a.innerHTML = `<i class="large material-icons">add</i>`;
+      a.onclick = () => createquizz();
 
-    div.appendChild(a);
-    let div_UserQ = document.getElementById("id-my-quizzes");
-    div_UserQ.firstElementChild.before(div);
+      div.appendChild(a);
+      let div_UserQ = document.getElementById("id-my-quizzes");
+      div_UserQ.firstElementChild.before(div);
+    };
+
     RenderAddButt();
-  };
+  }
+
 
   //Si aucun quizz n'est séléctionné
   main.innerHTML = "Pas de quiz séléctioné";
