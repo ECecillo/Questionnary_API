@@ -94,35 +94,28 @@ const getQuizzes = (p = 1) => {
     });
 };
 
-// mise-à-jour asynchrone de l'état avec les informations de l'utilisateur
-// getQuizzes télécharge la page 'p' des quizzes et la met dans l'état
-// puis relance le rendu
-// eslint-disable-next-line no-unused-vars
-const getUserQuizzes = (p = 1) => {
+// Récupère les quizz de l'utilisateur lorsque l'on se connecte
+const getUserQuizzes = () => {
   console.debug(`@getUserQuizzes`);
   const url = `${state.serverUrl}/users/quizzes`;
 
-  // le téléchargement est asynchrone, là màj de l'état et le rendu se fait dans le '.then'
   return fetch(url, { method: "GET", headers: state.headers() })
     .then(filterHttpResponse)
-    .then(CreateQuizzButt);
+    .then(CreateQuizzButt); // On affiche le bouton pour ajouter un quizz.
 };
 
-// mise-à-jour asynchrone de l'état avec les informations de l'utilisateur
-// getQuizzes télécharge la page 'p' des quizzes et la met dans l'état
-// puis relance le rendu
-// eslint-disable-next-line no-unused-vars
-const getAnswQuizzes = (p = 1) => {
+// Récupère les réponses de l'uilisateur.
+const getAnswQuizzes = () => {
   console.debug(`@getAnswQuizzes`);
   const url = `${state.serverUrl}/users/answers`;
 
-  // le téléchargement est asynchrone, là màj de l'état et le rendu se fait dans le '.then'
   return fetch(url, { method: "GET", headers: state.headers() })
     .then(filterHttpResponse)
-    .then(renderAnswQuizzes());
+    .then(renderAnswQuizzes()); // Affiche les réponses de l'utilisateur
 };
 
 // /!\ Télécharge le quiz avec les infos général /!\
+//id: id du quizz où l'on veut récup les infos.
 function getQuizzInfo(id) {
   console.debug(`@getQuizzInfo(${id})`);
   const url = `${state.serverUrl}/quizzes/${id}`;
@@ -132,7 +125,6 @@ function getQuizzInfo(id) {
     .then((data) => {
       state.currentQuizz = data;
       return data;
-      //console.debug(data);
     });
 }
 
@@ -164,7 +156,6 @@ const getQuestionData = (id, quest_id) => {
 // /!\ Va chercher toutes les infos d'un quizz avec son id, on a ces réponses ect ... /!\
 // id: est l'identifiant du quizz à télécharger
 // info: infos sur le quizz
-// data: questions du quizz
 function getInfoData(id) {
   console.debug(`@getInfoData(${id})`);
   const Info = `${state.serverUrl}/quizzes/${id}`;
@@ -184,9 +175,9 @@ function getInfoData(id) {
     .catch((err) => console.error(`Erreur: ${err}`));
 }
 
-// envoie les réponses à un quizz au serveur
-// form est l'objet formData du quizz à envoyer
-// eslint-disable-next-line no-unused-vars
+// Envoie les réponses à un quizz au serveur
+//Sform: l'élément où l'on a modifié / ajouter une réponse.
+//quiz_id: l'id du quiz dans lequel on a répondu.
 const sendQuizz = (Sform, quiz_id) => {
   console.debug(`@sendQuiz(${Sform}, ${quiz_id})`);
   let prop_content = Sform.target;
@@ -207,38 +198,12 @@ const sendQuizz = (Sform, quiz_id) => {
       return res;
     })
     .catch((err) => `Erreur: ${err}`);
-  // form
-  // const form = new FormData(Sform);
-  // const quiz_id = document.getElementById("quizz_content").dataset.id; // Récupère l'id du quiz
-
-  // const A = Array.from(form);
-  /* 
-  Promise.all(
-    A.map((pa) => {
-      const url = `${state.serverUrl}/quizzes/${quiz_id}/questions/${pa[0]}/answers/${pa[1]}`;
-
-      return fetch(url, { method: "POST", headers: state.headers() })
-        .then(filterHttpResponse)
-        .then((res) => {
-          const date = new Date(res.answered_at).toLocaleString();
-          const toast = M.toast({
-            html: `La question ${res.question_id} du quiz d'identifiant ${res.quiz_id} à été validé à ${date}`,
-            classes: "toast-update",
-            displayLength: 5000,
-          }).el;
-          toast.el.onclick = function dismiss() {
-            toast.timeRemaining = 0;
-          };
-          return res;
-        });
-    })
-  ).catch((err) => `Erreur: ${err}`); */
 };
 
 // On envoie le quiz créer par l'utilisateur.
 //titre: variable qui contient le titre du quiz que l'on récup avec value.
-// desc: variable qui contient la description du quiz  que l'on récup avec value.
-const sendNewQuizz = (titre, desc, Method, quiz_id) => {
+//desc: variable qui contient la description du quiz  que l'on récup avec value.
+const sendNewQuizzTitleDesc = (titre, desc, Method, quiz_id) => {
   if (Method === "POST") {
     var url = `${state.serverUrl}/quizzes`;
     var quiz = {
@@ -273,10 +238,12 @@ const sendNewQuizz = (titre, desc, Method, quiz_id) => {
     .catch(console.error);
 };
 
-// Créer des nouvelles questions et proposition ou les mofifies selon la valeur de methode.
+// Créer/Modifie des questions et des propositions.
 // id: id du quiz où l'on ajoutera les nouvelles prop.
+// idQ: id de la nouvelle question.
 // idP: le nombre de proposition.
 // sentence: la question qui sera rattaché au proposition.
+// methode: On peut choisir entre PUT et POST en fonction du cas de l'utilisation de la fonction.
 const sendUserProp = (id, idQ, idP, sentence, methode) => {
   console.debug(
     `@SendUserProp(${id},${idQ},${idP},${sentence},${methode},${useCase})`

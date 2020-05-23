@@ -1,5 +1,3 @@
-/* global state getQuizzes */
-
 // //////////////////////////////////////////////////////////////////////////////
 // HTML : fonctions génération de HTML à partir des données passées en paramètre
 // //////////////////////////////////////////////////////////////////////////////
@@ -157,7 +155,9 @@ const htmlQuizzesListContent = (quiz, userQuiz, answers) => {
   <div class="card indigo lighten-5">
     <div class="card-content black-text">
       <div ${userQuiz === true ? `id="quizz_head"` : ""}>
-        <span ${userQuiz === true ? `id="titleUserQuiz"` : ""} class="card-title">
+        <span ${
+          userQuiz === true ? `id="titleUserQuiz"` : ""
+        } class="card-title">
           ${quiz.info.title}
         </span>
         <p>Créer le ${date} par <a class="chip"> ${quiz.info.owner_id}
@@ -199,7 +199,7 @@ function renderQuizzes() {
   const nextBtn = document.getElementById("id-next-quizzes");
   // la liste de tous les quizzes individuels
   const quizzes = document.querySelectorAll("#id-all-quizzes-list li");
-  
+
   // les handlers quand on clique sur "<" ou ">"
   function clickBtnPager() {
     // remet à jour les données de state en demandant la page
@@ -233,13 +233,11 @@ function renderQuizzes() {
   });
 }
 
-
 function renderQuizzesSearch() {
   console.debug(`@renderQuizzesSearch()`);
 
   // les éléments à mettre à jour : le conteneur pour la liste des quizz
   //const usersElt = document.getElementById('id-all-quizzes-list');
-
 
   // on appelle la fonction de généraion et on met le HTML produit dans le DOM
   /*usersElt.innerHTML = htmlQuizzesList(
@@ -247,9 +245,8 @@ function renderQuizzesSearch() {
   );*/
 
   // la liste de tous les quizzes individuels
-  const quizes = document.querySelectorAll('#id-all-quizzes-list li');
+  const quizes = document.querySelectorAll("#id-all-quizzes-list li");
   console.log(quizes);
-
 
   // qd on clique sur un quizz, on change sont contenu avant affichage
   // l'affichage sera automatiquement déclenché par materializecss car on
@@ -262,15 +259,17 @@ function renderQuizzesSearch() {
     state.currentQuizz = quizzId;
 
     return getQuizzData(quizzId).then((data) => {
-      const Info = state.quizzes.results.find((e) => e.quiz_id === Number(quizzId));
+      const Info = state.quizzes.results.find(
+        (e) => e.quiz_id === Number(quizzId)
+      );
       return renderCurrentQuizz({ info: Info, questions: data });
     });
-  };
+  }
 
   quizes.forEach((q) => {
     console.log(q);
     q.onclick = (ev) => clickQuizz(ev);
-  })
+  });
   // pour chaque quizz, on lui associe son handler
   /*quizes.onclick = function clickQuizz(ev) {
     const element = ev.target;
@@ -289,6 +288,8 @@ function renderQuizzesSearch() {
 // pour un quizz selectionné, on affiche les données du quizz en question
 // C'est à dire que l'on affiche le formulaire pour séléctionner les réponses des questions
 // ainsi que leurs questions
+//data: les informations et les questions d'un quiz dans un object.
+//quiz_id: l'id du quiz que l'on a sélectionné.
 function renderCurrentQuizz(data, quiz_id) {
   console.debug(`@renderCurrentQuizz(${data}, ${quiz_id})`);
   const main = document.getElementById("id-all-quizzes-main");
@@ -332,8 +333,9 @@ function renderCurrentQuizz(data, quiz_id) {
   }
 }
 // On affiche la liste des quizzes disponibles de l'utilisateur.
+//quizzes: les données d'un quiz qui appartient à un user.
 const QuizzUtilisateur = (quizzes) => {
-  console.debug("@htmlUserQuizzes()");
+  console.debug(`@htmlUserQuizzes(${quizzes})`);
 
   const quizzesList = htmlQuizzesList(quizzes);
 
@@ -356,6 +358,7 @@ function CreateQuizzButt(quizz) {
   } else {
     usersElt.innerHTML = QuizzUtilisateur(quizz);
 
+    // Bouton de création d'un quizz.
     let RenderAddButt = () => {
       let div = document.createElement("div");
       div.className = "fixed-action-btn";
@@ -372,7 +375,6 @@ function CreateQuizzButt(quizz) {
 
     RenderAddButt();
   }
-
 
   //Si aucun quizz n'est séléctionné
   main.innerHTML = "Pas de quiz séléctioné";
@@ -403,10 +405,13 @@ function CreateQuizzButt(quizz) {
 // nameOfIcon: le nom de l'icone pour l'affichage par rapport à material icon
 // className: pour la génération d'eventlistener
 // divToAppend: si on veut le mettre à un endroit précis.
-function renderSmallFloatingObject(color, nameOfIcon, className, divToAppend) {
-  let a = document.createElement("a");
-  a.className = `btn-floating ${color} ${className}`;
-  a.innerHTML = `<i class="material-icons">${nameOfIcon}</i>`;
+function renderSmallFloatingObject(color, nameOfIcon, className) {
+  let a = `
+  <a class="btn-floating ${color} ${className}"> 
+    <i class="material-icons">${nameOfIcon}</i>
+  </a>
+  `;
+  return a;
 }
 
 // Pour un quizz selectionné, on affiche les données du quizz en question
@@ -424,29 +429,24 @@ function renderCurrentUserQuizz(quizz, quiz_id) {
     main.innerHTML = htmlQuizzesListContent(quizz, true);
 
     let title = document.getElementById("titleUserQuiz");
-    title.innerHTML += `
-    <a class="btn-floating grey changeTD"> 
-      <i class="material-icons">create</i>
-    </a>
-    `;
+    title.innerHTML += renderSmallFloatingObject("grey", "create", "changeTD");
 
     let quiz_head = document.getElementById("quizz_head");
-    quiz_head.innerHTML += `
-    <div class="modifier" style="padding: 0.2rem 0rem;">
-      <a class="btn-floating green create"> 
-        <i class="material-icons">add</i>
-      </a>
-    </div>
+    quiz_head.innerHTML += 
+    `
+      <div class="modifier" style="padding: 0.2rem 0rem;">
+        ${renderSmallFloatingObject("green", "add", "create")}
+      </div>
     `;
 
-    const changeTD = document.querySelector(".changeTD"); // Affichera changeTitleDesc
-    const createProp = document.querySelector(".create"); // Affichera addNewProp
-    let deleteForEVER = document.getElementsByClassName("delete_forever");
-    let edit_prop = document.getElementsByClassName("edit_prop");
+    let changeTD = document.querySelector(".changeTD"); // Affichera changeTitleDesc
+    let createProp = document.querySelector(".create"); // Affichera addNewProp
+    let deleteForEVER = document.getElementsByClassName("delete_forever"); // Affichera deleteQuestionUser
+    let edit_prop = document.getElementsByClassName("edit_prop"); // Affichera editUserQuizz
 
     createProp.addEventListener("click", function () {
       // On appuie sur le bouton PLUS
-      var sentence = () => {
+      var sentenceId = () => {
         // Retourne le nombre de Question dans le quiz sélectionné.
         let idQ = 0;
         while (document.querySelector(`#sentence_${idQ}`) !== null) {
@@ -454,7 +454,7 @@ function renderCurrentUserQuizz(quizz, quiz_id) {
         }
         return idQ;
       };
-      return addNewProp(quiz_id, sentence());
+      return addNewProp(quiz_id, sentenceId());
     });
 
     changeTD.addEventListener("click", function () {
@@ -462,6 +462,7 @@ function renderCurrentUserQuizz(quizz, quiz_id) {
     });
 
     Array.from(deleteForEVER).map(
+      //Pour chaque bouton on lui donne l'événement onclick deleteQuestionUser
       (el) =>
         (el.onclick = () => {
           let idQ = el.id;
@@ -470,6 +471,7 @@ function renderCurrentUserQuizz(quizz, quiz_id) {
     );
 
     Array.from(edit_prop).map(
+      //Pour chaque bouton on lui donne l'événement onclick editUserQuizz
       (el) =>
         (el.onclick = () => {
           let idQ = el.id;
@@ -480,11 +482,12 @@ function renderCurrentUserQuizz(quizz, quiz_id) {
   }
 }
 
-// Fonction qui ajoute une nouvelle proposition à un quiz
+// Fonction qui ajoute une nouvelle proposition à un quiz.
+//quizz_id: l'id du quiz dans lequelle on a cliqué. 
+//nbQ: l'id de la dernière question du quiz + 1.
 function addNewProp(quizz_id, nbQ) {
   console.debug(`addNewProp(${quizz_id})`);
   const modify = document.getElementById("id-modify-quizzes-main");
-  var idQ = nbQ;
   var idP = 0;
   const code = `
     <h4>Ajouter une proposition<h4>
@@ -513,10 +516,11 @@ function addNewProp(quizz_id, nbQ) {
   };
   document.getElementById("create_question").onclick = () => {
     const sentence = document.getElementById("question").value;
-    sendUserProp(quizz_id, idQ, idP, sentence, "POST");
+    sendUserProp(quizz_id, nbQ, idP, sentence, "POST");
   };
 }
 
+//Fonction qui permet de créer un nouveau quizz.
 function createquizz() {
   if (state.user) {
     console.debug(`@createquizz()`);
@@ -541,9 +545,11 @@ function createquizz() {
   }
 }
 
-// Fonction qui change le titre et la description d'un quiz
+// Fonction qui change le titre et la description d'un quiz.
+//quizz: les informations du quiz (titre, description) pour l'affichage dans les inputs.
+//quizz_id: l'id du quizz que l'on a sélectionné.
 function changeTitleDesc(quizz, quizz_id) {
-  console.debug("changeTitleDesc()");
+  console.debug(`changeTitleDesc(${quizz}, ${quizz_id})`);
   const modify = document.getElementById("id-modify-quizzes-main");
   const code = `
   <h4>Modifier le Titre et la Description<h4>
@@ -561,11 +567,13 @@ function changeTitleDesc(quizz, quizz_id) {
   document.getElementById("update_quiz").onclick = () => {
     let title = document.getElementById("new_title").value;
     let description = document.getElementById("new_desc").value;
-    sendNewQuizz(title, description, "PUT", quizz_id);
+    sendNewQuizzTitleDesc(title, description, "PUT", quizz_id);
   };
 }
 
 // Fonction qui supprime la question d'un quiz
+//quiz_id: l'id du quiz que l'on veut supprimer.
+//question_id: l'id de la question que l'on veut supprimer.
 function deleteQuestionUser(quiz_id, question_id) {
   console.debug(`deleteQuestionUser(${quiz_id},${question_id})`);
   const modify = document.getElementById("id-modify-quizzes-main");
@@ -589,12 +597,13 @@ function deleteQuestionUser(quiz_id, question_id) {
 }
 
 // Fonction qui Modifi la question et les propositions d'un quiz
+//quiz_id: l'id du quiz que où l'on veut modifier les propositions.
+//question_id: l'id de la question que l'on veut modifier.
 function editUserQuizz(quiz_id, question_id) {
   console.debug(`editUserQuizz(${quiz_id},${question_id})`);
   const modify = document.getElementById("id-modify-quizzes-main");
   getQuestionData(quiz_id, question_id); // récupère les infos du quiz que l'on a sélectionné.
   let question_info = state.currentQuizz;
-
   let idP = 0;
   let lenghtQuestion = question_info.propositions_number; // Nombre de propostion
   console.log(lenghtQuestion);
@@ -633,8 +642,7 @@ function editUserQuizz(quiz_id, question_id) {
   };
 }
 
-// quand on clique sur le bouton de login, il nous dit qui on est
-// eslint-disable-next-line no-unused-vars
+// Quand on clique sur le bouton de login, il nous dit qui on est et combien nous avons de quiz <= en développement.
 const renderUserBtn = () => {
   const btn = document.getElementById("id-login");
   btn.onclick = () => {
