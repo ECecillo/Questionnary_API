@@ -199,7 +199,7 @@ function renderQuizzes() {
   const nextBtn = document.getElementById("id-next-quizzes");
   // la liste de tous les quizzes individuels
   const quizzes = document.querySelectorAll("#id-all-quizzes-list li");
-
+  
   // les handlers quand on clique sur "<" ou ">"
   function clickBtnPager() {
     // remet à jour les données de state en demandant la page
