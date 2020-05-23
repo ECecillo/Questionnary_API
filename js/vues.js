@@ -490,16 +490,17 @@ function addNewProp(quizz_id, nbQ) {
   const modify = document.getElementById("id-modify-quizzes-main");
   var idP = 0;
   const code = `
+  <div id="addNewProp_div">
     <h4>Ajouter une proposition<h4>
     <label>Nouvelle question :
       <input placeholder='Votre question' id='question' type='text' class='validate'>
     </label>
     <label>
       <input type='radio' name='newQ' checked='true'><span>Proposition ${idP} :</span>
-      <input placeholder='Votre proposition' id='new_proposition${idP}' type='text' class='validate modified_proposition'>
+      <input placeholder='Votre proposition' id='new_proposition${idP}' type='text' class='validate modified_proposition' required>
     </label>
-      <button class='waves-effect waves-light btn' id='create_answer'>Nouvelle proposition</button><br><br>
-      <button class='waves-effect waves-light btn' id='create_question'>Ajouter la question</button>
+      <button class='waves-effect waves-light btn blue' id='create_answer'>Nouvelle proposition</button>
+      <button class='waves-effect waves-light btn green' id='create_question'>Ajouter la question</button>
         `;
 
   modify.innerHTML = code;
@@ -507,6 +508,7 @@ function addNewProp(quizz_id, nbQ) {
     idP++;
     let html = `
     <label>
+      <input type='radio' name='newQ'>
       <span>Proposition ${idP} :</span>
       <input placeholder='Votre proposition' id='new_proposition${idP}' type='text' class="validate modified_proposition">
     </label>`;
@@ -517,6 +519,7 @@ function addNewProp(quizz_id, nbQ) {
   document.getElementById("create_question").onclick = () => {
     const sentence = document.getElementById("question").value;
     sendUserProp(quizz_id, nbQ, idP, sentence, "POST");
+    document.getElementById("addNewProp_div").remove();
   };
 }
 
@@ -526,6 +529,7 @@ function createquizz() {
     console.debug(`@createquizz()`);
     let main = document.getElementById("id-my-quizzes-main");
     let code = `
+    <div id="Create_quiz">
       <h4>Nouveau Quizz<h4>
       <label>Titre :
         <input placeholder='Titre de votre quiz' id='titre' type='text' class='validate'>
@@ -534,13 +538,14 @@ function createquizz() {
         <input placeholder='Description de votre quiz' id='description' type='text' class='validate'>
       </label>
       <button class='waves-effect waves-light btn' id='create_quiz'>Créer le quiz</button>
-    `;
+    </div>`;
     main.innerHTML = code;
 
     document.getElementById("create_quiz").onclick = () => {
       let title = document.getElementById("titre").value;
       let description = document.getElementById("description").value;
-      sendNewQuizz(title, description, "POST");
+      sendNewQuizzTitleDesc(title, description, "POST");
+      document.getElementById("Create_quiz").remove();
     };
   }
 }
@@ -552,15 +557,16 @@ function changeTitleDesc(quizz, quizz_id) {
   console.debug(`changeTitleDesc(${quizz}, ${quizz_id})`);
   const modify = document.getElementById("id-modify-quizzes-main");
   const code = `
-  <h4>Modifier le Titre et la Description<h4>
-  <label>Titre :
-      <input placeholder='Le Nouveau titre' id='new_title' type='text' class='validate' value='${quizz.info.title}'>
-    </label>
-    <label>Description :
-      <input placeholder='La nouvelle description' id='new_desc' type='text' class='validate' value='${quizz.info.description}'>
-    </label>
-    <button class='waves-effect waves-light btn' id='update_quiz'>Modifier le Quiz</button>
-    `;
+  <div id="change_Title_Desc">
+    <h4>Modifier le Titre et la Description<h4>
+    <label>Titre :
+        <input placeholder='Le Nouveau titre' id='new_title' type='text' class='validate' value='${quizz.info.title}'>
+      </label>
+      <label>Description :
+        <input placeholder='La nouvelle description' id='new_desc' type='text' class='validate' value='${quizz.info.description}'>
+      </label>
+      <button class='waves-effect waves-light btn' id='update_quiz'>Modifier le Quiz</button>
+  </div>`;
 
   modify.innerHTML = code;
 
@@ -568,6 +574,7 @@ function changeTitleDesc(quizz, quizz_id) {
     let title = document.getElementById("new_title").value;
     let description = document.getElementById("new_desc").value;
     sendNewQuizzTitleDesc(title, description, "PUT", quizz_id);
+    document.getElementById("change_Title_Desc").remove();
   };
 }
 
@@ -596,7 +603,7 @@ function deleteQuestionUser(quiz_id, question_id) {
   };
 }
 
-// Fonction qui Modifi la question et les propositions d'un quiz
+// Fonction qui Modifie la question et les propositions d'un quiz
 //quiz_id: l'id du quiz que où l'on veut modifier les propositions.
 //question_id: l'id de la question que l'on veut modifier.
 function editUserQuizz(quiz_id, question_id) {
@@ -608,6 +615,7 @@ function editUserQuizz(quiz_id, question_id) {
   let lenghtQuestion = question_info.propositions_number; // Nombre de propostion
   console.log(lenghtQuestion);
   const code = `
+  <div id="modif_quizz">
     <h4>Modification de la Question<h4>
     <label>Question :
       <input placeholder='La nouvelle question' id='question' type='text' class='validate' value="${question_info.sentence}" required>
@@ -616,6 +624,7 @@ function editUserQuizz(quiz_id, question_id) {
     <button class='waves-effect waves-light btn green' id='modify_question'>
       Modifier la question
     </button>
+  </div>
     `;
 
   modify.innerHTML = code;
@@ -639,6 +648,7 @@ function editUserQuizz(quiz_id, question_id) {
   document.getElementById("modify_question").onclick = () => {
     const sentence = document.getElementById("question").value;
     sendUserProp(quiz_id, question_id, idP, sentence, "PUT", "update");
+    document.getElementById("modif_quizz").remove();
   };
 }
 
@@ -650,7 +660,7 @@ const renderUserBtn = () => {
       getUser();
       document.getElementById(
         "content-logout"
-      ).innerHTML = `<h5> ${state.user.lastname.toUpperCase()} ${
+      ).innerHTML = `<h5> 👤 ${state.user.lastname.toUpperCase()} ${
         state.user.firstname
       } (${state.user.user_id}) <br />
         Vous êtes l'auteur de</h5>`;
@@ -665,7 +675,7 @@ const renderUserBtn = () => {
       getUser();
       if (state.xApiKey != "") {
         document.getElementById("confirm-message").innerHTML =
-          '<h5 style="color:green;">Connecté !</h5>';
+          '<h5 style="color:green;">Heureux de vous revoir 🤟</h5>';
         document.getElementById("login").remove();
         document.getElementById("log").innerHTML =
           '<a class="waves-effect waves-light btn modal-trigger" id="id-login" href="#modal2"><i class="Large material-icons">keyboard_backspace</i></a>';

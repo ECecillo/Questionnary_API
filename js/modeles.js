@@ -188,9 +188,9 @@ const sendQuizz = (Sform, quiz_id) => {
     .then((res) => {
       const date = new Date(res.answered_at).toLocaleString();
       const toast = M.toast({
-        html: `La question ${res.question_id} du quiz d'identi  fiant ${res.quiz_id} à été validé à ${date}`,
-        classes: "toast-update",
+        html: `La question ${res.question_id} du quiz d'identifiant ${res.quiz_id} à été validé à ${date} 👊`,
         displayLength: 5000,
+        classes: 'green rounded'
       }).el;
       toast.el.onclick = function dismiss() {
         toast.timeRemaining = 0;
@@ -203,6 +203,8 @@ const sendQuizz = (Sform, quiz_id) => {
 // On envoie le quiz créer par l'utilisateur.
 //titre: variable qui contient le titre du quiz que l'on récup avec value.
 //desc: variable qui contient la description du quiz  que l'on récup avec value.
+//Method: selon le cas d'utilisation, soit on modifie le titre et la description du quiz, soit on en créer un nouveau.
+//quiz_id: id du quiz que l'on veut modifier si on a mis PUT en methode.
 const sendNewQuizzTitleDesc = (titre, desc, Method, quiz_id) => {
   if (Method === "POST") {
     var url = `${state.serverUrl}/quizzes`;
@@ -226,13 +228,12 @@ const sendNewQuizzTitleDesc = (titre, desc, Method, quiz_id) => {
   })
     .then(filterHttpResponse)
     .then(() => {
-      // const date = new Date(data.answered_at).toLocaleString();
       const toast = M.toast({
         html: `Quiz numéro ${quiz.quiz_id}. <br>
             Titre : ${quiz.title}.
             <br>Description : ${quiz.description}.`,
-        classes: "toast-update",
         displayLength: 5000,
+        classes: 'blue rounded'
       });
     })
     .catch(console.error);
@@ -246,7 +247,7 @@ const sendNewQuizzTitleDesc = (titre, desc, Method, quiz_id) => {
 // methode: On peut choisir entre PUT et POST en fonction du cas de l'utilisation de la fonction.
 const sendUserProp = (id, idQ, idP, sentence, methode) => {
   console.debug(
-    `@SendUserProp(${id},${idQ},${idP},${sentence},${methode},${useCase})`
+    `@SendUserProp(${id},${idQ},${idP},${sentence},${methode})`
   );
   let url = `${state.serverUrl}/quizzes/${id}/questions/`;
 
@@ -288,13 +289,26 @@ const sendUserProp = (id, idQ, idP, sentence, methode) => {
   })
     .then(filterHttpResponse)
     .then(() => {
-      var toast = M.toast({
-        html: "Une nouvelle proposition a été ajouté !",
-        displayLength: 5000,
-      });
-      toast.el.onclick = function dismiss() {
-        toast.timeRemaining = 0;
-      };
+      if(methode === "PUT") {
+        M.toast({
+          html: "Votre proposition a été modifié avec brio &#128076",
+          displayLength: 5000,
+          classes: 'blue rounded'
+        });
+        toast.el.onclick = function dismiss() {
+          toast.timeRemaining = 0;
+        };
+      }else {
+        M.toast({
+          html: "Une nouvelle proposition a été ajouté &#128170",
+          displayLength: 5000,
+          classes: 'green rounded'
+        });
+        toast.el.onclick = function dismiss() {
+          toast.timeRemaining = 0;
+        };
+      }
+      
     })
     .catch(console.error);
 };
@@ -311,7 +325,14 @@ const sendDeleteQuestion = (quizz_id, question_id) => {
   })
     .then(filterHttpResponse)
     .then(() => {
-      //le toast pour dire que l'on a bien supprimer le quiz
+       M.toast({
+        html: "Votre Question a été supprimé avec succès ❗",
+        displayLength: 5000,
+        classes: 'red rounded'
+      });
+      toast.el.onclick = function dismiss() {
+        toast.timeRemaining = 0;
+      };
     });
 };
 
