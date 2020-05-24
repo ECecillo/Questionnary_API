@@ -94,6 +94,8 @@ LIFAP5 - projet 2019-2020 : gestionnaire de QCM
 
 ## Remarques sur la partie optionnelle :
 
+- Pour la fonctionnalité de modification d'une proposition d'un quiz, il **faut appuyer deux fois sur le bouton modifier** pour que l'on puisse voir la question et les propositions. Si on change de proposition à modifier, on doit appuyer deux fois sur le logo sinon nous n'avons pas les valeurs déjà présente dans la proposition.
+
 - La fonctionnalité de Recherche de quiz **n'est pas complétement fonctionnelle**.
 	- Elle affiche seulement les quiz qui ont un numéro étudiant ou un élément peu présent dans d'autre quiz.
 	-  Nous avons essayés de travailler avec un **rate limiter** pour faire en sorte que le serveur ne nous bloquent pas lorsque nous faisions une recherche dans la base de donnée.
