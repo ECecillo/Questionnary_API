@@ -1,3 +1,9 @@
+
+// //////////////////////////////////////////////////////////////////////////////
+// Affiche le modale lorsque l'on clique sur l'icone et gère l'affichage.
+// //////////////////////////////////////////////////////////////////////////////
+
+
 // Quand on clique sur le bouton de login, il nous dit qui on est et combien nous avons de quiz <= en développement.
 const renderUserBtn = () => {
   const btn = document.getElementById("id-login");
